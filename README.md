@@ -129,7 +129,7 @@ While this configuration uses the cheapest options available:
 
 This configuration implements security best practices:
 
-- Private subnets with controlled egress
+- Public subnets with internet gateway for SageMaker Studio connectivity
 - S3 bucket with public access blocked
 - IAM roles with least-privilege access
 - Security groups with minimal required rules

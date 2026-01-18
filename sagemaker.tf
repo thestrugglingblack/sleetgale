@@ -1,3 +1,9 @@
+# SageMaker image ARNs for cost-effective instances
+locals {
+  jupyter_server_image_arn = "arn:aws:sagemaker:${var.aws_region}:081325390199:image/jupyter-server-3"
+  datascience_image_arn    = "arn:aws:sagemaker:${var.aws_region}:081325390199:image/datascience-1.0"
+}
+
 # SageMaker Studio Domain
 resource "aws_sagemaker_domain" "sleetgale" {
   domain_name = var.domain_name
@@ -13,7 +19,7 @@ resource "aws_sagemaker_domain" "sleetgale" {
     jupyter_server_app_settings {
       default_resource_spec {
         instance_type       = "system"
-        sagemaker_image_arn = "arn:aws:sagemaker:${var.aws_region}:081325390199:image/jupyter-server-3"
+        sagemaker_image_arn = local.jupyter_server_image_arn
       }
     }
 
@@ -21,7 +27,7 @@ resource "aws_sagemaker_domain" "sleetgale" {
     kernel_gateway_app_settings {
       default_resource_spec {
         instance_type       = "ml.t3.medium"
-        sagemaker_image_arn = "arn:aws:sagemaker:${var.aws_region}:081325390199:image/datascience-1.0"
+        sagemaker_image_arn = local.datascience_image_arn
       }
     }
   }
@@ -48,14 +54,14 @@ resource "aws_sagemaker_user_profile" "default_user" {
     jupyter_server_app_settings {
       default_resource_spec {
         instance_type       = "system"
-        sagemaker_image_arn = "arn:aws:sagemaker:${var.aws_region}:081325390199:image/jupyter-server-3"
+        sagemaker_image_arn = local.jupyter_server_image_arn
       }
     }
 
     kernel_gateway_app_settings {
       default_resource_spec {
         instance_type       = "ml.t3.medium"
-        sagemaker_image_arn = "arn:aws:sagemaker:${var.aws_region}:081325390199:image/datascience-1.0"
+        sagemaker_image_arn = local.datascience_image_arn
       }
     }
   }

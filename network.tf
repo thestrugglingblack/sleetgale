@@ -28,7 +28,7 @@ resource "aws_subnet" "sagemaker_subnets" {
   vpc_id                  = aws_vpc.sagemaker_vpc.id
   cidr_block              = var.subnet_cidrs[count.index]
   availability_zone       = data.aws_availability_zones.available.names[count.index]
-  map_public_ip_on_launch = false
+  map_public_ip_on_launch = true
 
   tags = {
     Name = "${var.domain_name}-subnet-${count.index + 1}"
