@@ -1,5 +1,10 @@
 # SSL Certificate and Custom Domain Configuration
 
+# Validation for custom domain configuration
+locals {
+  validate_custom_domain = var.enable_custom_domain && var.custom_domain_name == "" ? tobool("ERROR: When enable_custom_domain is true, custom_domain_name must be provided.") : true
+}
+
 # Route 53 Hosted Zone (optional - create new or use existing)
 resource "aws_route53_zone" "custom_domain" {
   count = var.enable_custom_domain && var.create_route53_zone ? 1 : 0
@@ -158,7 +163,7 @@ resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.sagemaker_alb[0].arn
   port              = 443
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = local.certificate_arn
 
   default_action {

@@ -3,6 +3,13 @@
 # Note: AWS IAM Identity Center must be manually enabled in the AWS account before using these resources
 # The sso_instance_arn and sso_identity_store_id must be provided as variables
 
+# Note: This file uses data.aws_caller_identity.current which is defined in iam.tf
+
+# Validation for SSO configuration
+locals {
+  validate_sso_config = var.enable_sso && (var.sso_instance_arn == "" || var.sso_identity_store_id == "") ? tobool("ERROR: When enable_sso is true, both sso_instance_arn and sso_identity_store_id must be provided. Run: aws sso-admin list-instances") : true
+}
+
 # Permission Set for SageMaker Administrators
 resource "aws_ssoadmin_permission_set" "sagemaker_admin" {
   count            = var.enable_sso ? 1 : 0
