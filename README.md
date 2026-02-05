@@ -1,5 +1,18 @@
-# sleetgale
+```text
+ ______     __         ______     ______     ______   ______     ______     __         ______    
+/\  ___\   /\ \       /\  ___\   /\  ___\   /\__  _\ /\  ___\   /\  __ \   /\ \       /\  ___\   
+\ \___  \  \ \ \____  \ \  __\   \ \  __\   \/_/\ \/ \ \ \__ \  \ \  __ \  \ \ \____  \ \  __\   
+ \/\_____\  \ \_____\  \ \_____\  \ \_____\    \ \_\  \ \_____\  \ \_\ \_\  \ \_____\  \ \_____\ 
+  \/_____/   \/_____/   \/_____/   \/_____/     \/_/   \/_____/   \/_/\/_/   \/_____/   \/_____/                                                                                                  
+```
 
+## Table of Contents
+- [Overview](#overview)
+- [Cost Optimization Features](#cost-optimization-features)
+- [Configuration Details](#configuration-details)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 Terraform configuration for creating the cheapest Amazon SageMaker Studio instance.
 
 ## Overview

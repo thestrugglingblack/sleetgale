@@ -10,6 +10,12 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "profile_name" {
+  description = "AWS CLI profile name"
+  type        = string
+  default     = "default"
+}
+
 variable "domain_name" {
   description = "SageMaker Studio domain name"
   type        = string
