@@ -6,6 +6,8 @@ locals {
 }
 
 # Route 53 Hosted Zone (optional - create new or use existing)
+# NOTE: When creating a new zone, custom_domain_name should ideally be the base domain (e.g., savantpraxis.com)
+# not a subdomain (e.g., sagemaker.savantpraxis.com). However, the recommended approach is to use an existing zone.
 resource "aws_route53_zone" "custom_domain" {
   count = var.enable_custom_domain && var.create_route53_zone ? 1 : 0
   name  = var.custom_domain_name

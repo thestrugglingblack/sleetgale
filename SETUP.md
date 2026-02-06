@@ -145,16 +145,18 @@ route53_zone_id      = "Z1234567890ABC"
 certificate_arn      = "arn:aws:acm:us-east-1:123456789012:certificate/..."
 ```
 
-### Option C: Using External DNS Provider
+### Option C: Using External DNS Provider (Not Recommended for savantpraxis.com)
+
+**Note**: For savantpraxis.com, it's recommended to use the existing Route53 zone (Option A) instead of this approach.
+
+If you need to use an external DNS provider:
 
 1. Deploy with Route 53 zone creation:
    ```hcl
    enable_custom_domain = true
-   custom_domain_name   = "sagemaker.savantpraxis.com"
+   custom_domain_name   = "sagemaker.yourdomain.com"
    create_route53_zone  = true
    ```
-
-   **Note**: For savantpraxis.com, use the existing zone instead (route53_zone_id).
 
 2. After deployment, get name servers:
    ```bash

@@ -82,19 +82,23 @@ resource "aws_iam_role" "sso_sagemaker_execution_role" {
           Service = "sagemaker.amazonaws.com"
         }
         Action = "sts:AssumeRole"
-      },
-      {
-        Effect = "Allow"
-        Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:saml-provider/OktaSAML"
-        }
-        Action = "sts:AssumeRoleWithSAML"
-        Condition = {
-          StringEquals = {
-            "SAML:aud" = "https://signin.aws.amazon.com/saml"
-          }
-        }
       }
+      # NOTE: The SAML provider trust relationship is commented out as it requires
+      # manual creation of the SAML provider in IAM. When using AWS IAM Identity Center,
+      # the SAML provider is managed by the service and not needed here.
+      # If using standalone Okta SAML (without IAM Identity Center), uncomment this:
+      # {
+      #   Effect = "Allow"
+      #   Principal = {
+      #     Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:saml-provider/OktaSAML"
+      #   }
+      #   Action = "sts:AssumeRoleWithSAML"
+      #   Condition = {
+      #     StringEquals = {
+      #       "SAML:aud" = "https://signin.aws.amazon.com/saml"
+      #     }
+      #   }
+      # }
     ]
   })
 
