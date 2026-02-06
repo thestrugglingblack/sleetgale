@@ -151,6 +151,22 @@ aws sts get-caller-identity
 aws iam list-user-policies --user-name YOUR_USERNAME
 ```
 
+#### ACM Certificate Validation Error
+```bash
+# Error: UnsupportedCertificate - certificate not validated yet
+
+# Check certificate status
+aws acm describe-certificate \
+  --certificate-arn YOUR_CERT_ARN \
+  --region us-east-1 \
+  --query Certificate.Status
+
+# If PENDING_VALIDATION: wait 15-30 minutes, then retry
+# If ISSUED: retry terraform apply
+
+# See ACM_CERTIFICATE_ERROR_EXPLANATION.md for details
+```
+
 #### Certificate Validation Stuck
 ```bash
 # Check DNS records

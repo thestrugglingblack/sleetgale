@@ -414,6 +414,15 @@ Common Terraform permission errors and solutions:
 - Verify your current identity: `aws sts get-caller-identity`
 - Check attached policies: `aws iam list-user-policies --user-name YOUR_USERNAME`
 
+**ACM Certificate Validation Errors**:
+
+If you get `UnsupportedCertificate` errors:
+- **Error**: "The certificate must have a fully-qualified domain name"
+- **Cause**: Certificate is not yet validated (status is PENDING_VALIDATION)
+- **Solution**: Wait 15-30 minutes for DNS validation, then retry `terraform apply`
+- Check status: `aws acm describe-certificate --certificate-arn YOUR_ARN --query Certificate.Status`
+- **See [ACM_CERTIFICATE_ERROR_EXPLANATION.md](ACM_CERTIFICATE_ERROR_EXPLANATION.md)** for detailed troubleshooting
+
 **High Costs**:
 - Stop unused SageMaker apps in the console
 - Use `terraform destroy` when infrastructure is not needed

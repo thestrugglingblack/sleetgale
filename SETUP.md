@@ -623,6 +623,47 @@ aws iam put-user-policy \
   }'
 ```
 
+**Issue: "UnsupportedCertificate: The certificate must have a fully-qualified domain name"**
+```
+Error: creating ELBv2 Listener: api error UnsupportedCertificate: 
+The certificate must have a fully-qualified domain name, a supported signature, 
+and a supported key size.
+```
+
+This error occurs when the ACM certificate is not yet validated.
+
+```bash
+# STEP 1: Check certificate status
+aws acm describe-certificate \
+  --certificate-arn YOUR_CERT_ARN \
+  --region us-east-1 \
+  --query 'Certificate.Status' \
+  --output text
+
+# STEP 2: If status is "PENDING_VALIDATION":
+# Wait 15-30 minutes for DNS propagation and validation
+# Check status periodically
+
+# STEP 3: When status is "ISSUED":
+terraform apply  # Retry - it will work now!
+
+# If stuck in PENDING_VALIDATION:
+# Check DNS validation records were created
+aws route53 list-resource-record-sets \
+  --hosted-zone-id YOUR_ZONE_ID \
+  --query "ResourceRecordSets[?Type=='CNAME' && contains(Name, '_')]"
+
+# Verify nameserver delegation
+aws route53 get-hosted-zone --id YOUR_ZONE_ID
+
+# See ACM_CERTIFICATE_ERROR_EXPLANATION.md for full troubleshooting
+```
+
+**Solution Summary**:
+- **Root Cause**: Certificate validation takes 5-30 minutes
+- **Fix**: Wait for certificate status to become "ISSUED", then retry
+- **Prevention**: Pre-validate certificate or use `certificate_arn` variable
+
 **Issue: "Error creating SageMaker Domain"**
 ```
 Error: error creating SageMaker Domain: ValidationException: 
