@@ -135,12 +135,12 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
-# Target Group for SageMaker
+# Target Group for Portal (HTTP on port 8080)
 resource "aws_lb_target_group" "sagemaker_tg" {
   count       = var.enable_custom_domain ? 1 : 0
   name        = "${var.domain_name}-tg"
-  port        = 443
-  protocol    = "HTTPS"
+  port        = 8080
+  protocol    = "HTTP"
   vpc_id      = aws_vpc.sagemaker_vpc.id
   target_type = "ip"
 
@@ -149,12 +149,14 @@ resource "aws_lb_target_group" "sagemaker_tg" {
     healthy_threshold   = 2
     interval            = 30
     matcher             = "200"
-    path                = "/"
+    path                = "/health"
     port                = "traffic-port"
-    protocol            = "HTTPS"
+    protocol            = "HTTP"
     timeout             = 5
     unhealthy_threshold = 2
   }
+
+  deregistration_delay = 30
 
   tags = {
     Name = "${var.domain_name}-tg"

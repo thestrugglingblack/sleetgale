@@ -70,3 +70,18 @@ output "auth_mode" {
   description = "The authentication mode of the SageMaker domain"
   value       = var.enable_sso ? "SSO" : "IAM"
 }
+
+output "portal_ecr_repository" {
+  description = "ECR repository URL for the portal container image"
+  value       = var.enable_custom_domain ? aws_ecr_repository.portal[0].repository_url : null
+}
+
+output "portal_cluster_name" {
+  description = "ECS cluster name for the portal"
+  value       = var.enable_custom_domain ? aws_ecs_cluster.portal[0].name : null
+}
+
+output "portal_service_name" {
+  description = "ECS service name for the portal"
+  value       = var.enable_custom_domain ? aws_ecs_service.portal[0].name : null
+}

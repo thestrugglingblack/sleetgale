@@ -6,7 +6,7 @@ Terraform configuration for creating a cost-optimized Amazon SageMaker Studio en
 
 This Terraform configuration creates a SageMaker Studio environment with:
 - **Basic Mode (Default)**: SageMaker Studio domain with IAM-based authentication
-- **Custom Domain Mode (Optional)**: Custom domain with SSL/TLS certificate via AWS Certificate Manager
+- **Custom Domain Mode (Optional)**: Custom domain with SSL/TLS certificate AND web portal for Studio access
 - **SSO Mode (Optional)**: AWS IAM Identity Center integration with Okta for SAML-based authentication
 - VPC with 2 subnets across different availability zones
 - Minimal instance types (ml.t3.medium for compute, "system" for JupyterServer)
@@ -22,11 +22,22 @@ This Terraform configuration creates a SageMaker Studio environment with:
 - **Networking**: Simple VPC setup with minimal resources
 
 ### Security & Enterprise Features
-- **Custom Domain**: Support for custom domain names with SSL/TLS certificates
+- **Custom Domain with Web Portal**: Access SageMaker Studio through your own domain with automated presigned URL generation
 - **HTTPS Enforcement**: All traffic encrypted with valid SSL certificates
 - **SSO Integration**: Optional Okta integration via AWS IAM Identity Center
 - **Role-Based Access**: Configurable permission sets for admins and users
 - **Private Networking**: VPC-based deployment with security groups
+
+### Custom Domain Portal (NEW!)
+
+When custom domain is enabled, a **web portal** is automatically deployed that:
+- Runs behind your custom domain (e.g., `analysis.savantpraxis.com`)
+- Provides a single-click "Launch Studio" button
+- Generates fresh SageMaker presigned URLs automatically
+- Redirects users seamlessly to their Studio environment
+- No need to use AWS Console for Studio access
+
+See [CUSTOM_DOMAIN_PORTAL.md](CUSTOM_DOMAIN_PORTAL.md) for complete documentation.
 
 ## Prerequisites
 
@@ -44,7 +55,62 @@ This Terraform configuration creates a SageMaker Studio environment with:
   - Okta administrator access to configure SAML application
   - SSO instance ARN and identity store ID
 
-## Quick Start (Basic IAM Mode)
+## Custom Domain with Portal
+
+When you enable custom domain, a web portal is automatically deployed to provide seamless access to SageMaker Studio:
+
+### Quick Setup
+
+1. **Enable custom domain in terraform.tfvars**:
+   ```hcl
+   enable_custom_domain = true
+   custom_domain_name   = "analysis.savantpraxis.com"
+   route53_zone_id      = "Z1234567890ABC"
+   ```
+
+2. **Deploy infrastructure**:
+   ```bash
+   terraform init
+   terraform apply
+   ```
+
+3. **Deploy portal container**:
+   ```bash
+   ./deploy-portal.sh
+   ```
+
+4. **Access SageMaker Studio**:
+   ```
+   https://analysis.savantpraxis.com
+   ```
+   Click "Launch Studio" and you're in!
+
+### What Gets Deployed
+
+The custom domain setup includes:
+- **Application Load Balancer** with SSL/TLS certificate
+- **Route 53 DNS** records pointing to ALB
+- **ECS Fargate** cluster running the portal container
+- **Web Portal** that generates presigned URLs for Studio
+- **IAM roles** with SageMaker permissions
+- **CloudWatch logs** for monitoring
+
+### Architecture
+
+```
+User → analysis.savantpraxis.com
+       ↓ (HTTPS)
+     ALB + SSL Certificate
+       ↓ (HTTP)
+     Portal Container (ECS Fargate)
+       ├── Show "Launch Studio" button
+       ├── Generate presigned URL (AWS SDK)
+       └── Redirect to SageMaker Studio
+```
+
+**See [CUSTOM_DOMAIN_PORTAL.md](CUSTOM_DOMAIN_PORTAL.md) for complete documentation.**
+
+## Basic Setup (No Custom Domain)
 
 ### Initialize Terraform
 
