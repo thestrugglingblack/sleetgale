@@ -10,3 +10,43 @@
 # VPC Configuration
 # vpc_cidr = "10.0.0.0/16"
 # subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
+
+# ========================================
+# Custom Domain and SSL Configuration
+# ========================================
+# Enable custom domain with SSL (default: false)
+# enable_custom_domain = false
+
+# Custom domain name for SageMaker Studio
+# custom_domain_name = "sagemaker.savantpraxis.com"
+
+# Route 53 hosted zone ID (if using existing zone)
+# route53_zone_id = "Z1234567890ABC"
+
+# Create new Route 53 hosted zone (default: false)
+# create_route53_zone = false
+
+# Existing ACM certificate ARN (if not creating new certificate)
+# certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+
+# ========================================
+# Okta SSO Configuration
+# ========================================
+# Enable AWS SSO with Okta integration (default: false)
+# enable_sso = false
+
+# AWS SSO instance ARN (required if enable_sso is true)
+# Can be found in IAM Identity Center console
+# sso_instance_arn = "arn:aws:sso:::instance/ssoins-1234567890abcdef"
+
+# AWS SSO identity store ID (required if enable_sso is true)
+# Can be found in IAM Identity Center console
+# sso_identity_store_id = "d-1234567890"
+
+# Okta SAML 2.0 IdP metadata URL
+# okta_idp_metadata_url = "https://dev-12345678.okta.com/app/exk1234567890abcdef/sso/saml/metadata"
+
+# SSO group names for SageMaker access control
+# sso_admin_group_name = "SageMakerAdmins"
+# sso_user_group_name = "SageMakerUsers"
+
