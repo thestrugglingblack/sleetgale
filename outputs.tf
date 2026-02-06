@@ -71,17 +71,17 @@ output "auth_mode" {
   value       = var.enable_sso ? "SSO" : "IAM"
 }
 
-output "portal_ecr_repository" {
-  description = "ECR repository URL for the portal container image"
-  value       = var.enable_custom_domain ? aws_ecr_repository.portal[0].repository_url : null
+output "portal_lambda_function_name" {
+  description = "Lambda function name for the portal"
+  value       = var.enable_custom_domain ? aws_lambda_function.portal[0].function_name : null
 }
 
-output "portal_cluster_name" {
-  description = "ECS cluster name for the portal"
-  value       = var.enable_custom_domain ? aws_ecs_cluster.portal[0].name : null
+output "portal_lambda_arn" {
+  description = "Lambda function ARN for the portal"
+  value       = var.enable_custom_domain ? aws_lambda_function.portal[0].arn : null
 }
 
-output "portal_service_name" {
-  description = "ECS service name for the portal"
-  value       = var.enable_custom_domain ? aws_ecs_service.portal[0].name : null
+output "portal_lambda_log_group" {
+  description = "CloudWatch log group for portal Lambda"
+  value       = var.enable_custom_domain ? aws_cloudwatch_log_group.portal_lambda[0].name : null
 }

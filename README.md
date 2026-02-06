@@ -30,14 +30,16 @@ This Terraform configuration creates a SageMaker Studio environment with:
 
 ### Custom Domain Portal (NEW!)
 
-When custom domain is enabled, a **web portal** is automatically deployed that:
-- Runs behind your custom domain (e.g., `analysis.savantpraxis.com`)
+When custom domain is enabled, a **serverless web portal** is automatically deployed that:
+- Runs on AWS Lambda (pay per request, not 24/7)
 - Provides a single-click "Launch Studio" button
 - Generates fresh SageMaker presigned URLs automatically
 - Redirects users seamlessly to their Studio environment
-- No need to use AWS Console for Studio access
+- **Costs ~$0.20-1/month instead of $7-10/month** (90% savings!)
 
-See [CUSTOM_DOMAIN_PORTAL.md](CUSTOM_DOMAIN_PORTAL.md) for complete documentation.
+No container management, no ECS costs - just simple serverless deployment.
+
+See deployment instructions below for details.
 
 ## Prerequisites
 
@@ -74,7 +76,7 @@ When you enable custom domain, a web portal is automatically deployed to provide
    terraform apply
    ```
 
-3. **Deploy portal container**:
+3. **Deploy Lambda portal** (optional - terraform handles this):
    ```bash
    ./deploy-portal.sh
    ```
@@ -88,10 +90,9 @@ When you enable custom domain, a web portal is automatically deployed to provide
 ### What Gets Deployed
 
 The custom domain setup includes:
+- **AWS Lambda Function** - Serverless portal (128MB, pay per request)
 - **Application Load Balancer** with SSL/TLS certificate
 - **Route 53 DNS** records pointing to ALB
-- **ECS Fargate** cluster running the portal container
-- **Web Portal** that generates presigned URLs for Studio
 - **IAM roles** with SageMaker permissions
 - **CloudWatch logs** for monitoring
 
@@ -101,14 +102,20 @@ The custom domain setup includes:
 User → analysis.savantpraxis.com
        ↓ (HTTPS)
      ALB + SSL Certificate
-       ↓ (HTTP)
-     Portal Container (ECS Fargate)
+       ↓ (Invoke)
+     Lambda Function (Serverless)
        ├── Show "Launch Studio" button
        ├── Generate presigned URL (AWS SDK)
        └── Redirect to SageMaker Studio
 ```
 
-**See [CUSTOM_DOMAIN_PORTAL.md](CUSTOM_DOMAIN_PORTAL.md) for complete documentation.**
+### Cost
+
+- **Lambda**: ~$0.20-1/month (first 1M requests FREE)
+- **ALB**: ~$16/month (required for custom domain)
+- **Total**: ~$16-17/month
+
+**vs ECS version**: Would be ~$23-26/month (Lambda saves $7-10/month)
 
 ## Basic Setup (No Custom Domain)
 

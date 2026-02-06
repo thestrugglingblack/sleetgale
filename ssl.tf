@@ -135,14 +135,11 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
-# Target Group for Portal (HTTP on port 8080)
+# Target Group for Lambda Portal
 resource "aws_lb_target_group" "sagemaker_tg" {
   count       = var.enable_custom_domain ? 1 : 0
   name        = "${var.domain_name}-tg"
-  port        = 8080
-  protocol    = "HTTP"
-  vpc_id      = aws_vpc.sagemaker_vpc.id
-  target_type = "ip"
+  target_type = "lambda"
 
   health_check {
     enabled             = true
@@ -150,16 +147,12 @@ resource "aws_lb_target_group" "sagemaker_tg" {
     interval            = 30
     matcher             = "200"
     path                = "/health"
-    port                = "traffic-port"
-    protocol            = "HTTP"
     timeout             = 5
     unhealthy_threshold = 2
   }
 
-  deregistration_delay = 30
-
   tags = {
-    Name = "${var.domain_name}-tg"
+    Name = "${var.domain_name}-tg-lambda"
   }
 }
 
