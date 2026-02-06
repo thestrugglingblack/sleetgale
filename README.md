@@ -111,10 +111,6 @@ Find your zone ID with:
 aws route53 list-hosted-zones --query 'HostedZones[?Name==`savantpraxis.com.`].Id' --output text
 ```
 
-#### Option B: Use Existing Route 53 Zone
-
-Delete this duplicate section as it's now covered in Option A.
-
 #### Option B: Use Existing ACM Certificate
 
 If you already have a certificate for savantpraxis.com:
