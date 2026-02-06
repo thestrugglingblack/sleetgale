@@ -66,7 +66,7 @@ Enable HTTPS access to SageMaker via your own domain name.
 
 ### Prerequisites
 
-- Domain name (e.g., `example.com`)
+- Domain name (e.g., `savantpraxis.com`)
 - DNS access (Route 53 or external DNS provider)
 - Basic setup completed OR fresh installation
 
@@ -76,8 +76,8 @@ Enable HTTPS access to SageMaker via your own domain name.
 
 **If domain is already in Route 53:**
 ```bash
-# Get your hosted zone ID
-aws route53 list-hosted-zones --query 'HostedZones[?Name==`example.com.`].Id' --output text
+# Get your hosted zone ID for savantpraxis.com
+aws route53 list-hosted-zones --query 'HostedZones[?Name==`savantpraxis.com.`].Id' --output text
 ```
 
 **If domain needs to be added to Route 53:**
@@ -91,15 +91,12 @@ aws route53 list-hosted-zones --query 'HostedZones[?Name==`example.com.`].Id' --
 Create a `terraform.tfvars` file:
 
 ```hcl
-# Using existing Route 53 zone
+# Using existing Route 53 zone for savantpraxis.com
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
+custom_domain_name   = "sagemaker.savantpraxis.com"
 route53_zone_id      = "Z1234567890ABC"  # Your zone ID from step 1
 
-# Or create new zone
-# enable_custom_domain = true
-# custom_domain_name   = "sagemaker.example.com"
-# create_route53_zone  = true
+# Note: create_route53_zone is not needed since we're using an existing zone
 ```
 
 #### Step 3: Deploy
@@ -133,7 +130,7 @@ terraform output route53_zone_nameservers
 
 ```bash
 # Wait a few minutes for DNS propagation, then access:
-https://sagemaker.example.com
+https://sagemaker.savantpraxis.com
 ```
 
 ### Option B: Using Existing Certificate
@@ -143,7 +140,7 @@ If you already have an ACM certificate:
 ```hcl
 # terraform.tfvars
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
+custom_domain_name   = "sagemaker.savantpraxis.com"
 route53_zone_id      = "Z1234567890ABC"
 certificate_arn      = "arn:aws:acm:us-east-1:123456789012:certificate/..."
 ```
@@ -153,9 +150,11 @@ certificate_arn      = "arn:aws:acm:us-east-1:123456789012:certificate/..."
 1. Deploy with Route 53 zone creation:
    ```hcl
    enable_custom_domain = true
-   custom_domain_name   = "sagemaker.example.com"
+   custom_domain_name   = "sagemaker.savantpraxis.com"
    create_route53_zone  = true
    ```
+
+   **Note**: For savantpraxis.com, use the existing zone instead (route53_zone_id).
 
 2. After deployment, get name servers:
    ```bash
@@ -410,7 +409,7 @@ domain_name = "sleetgale-prod"
 
 # Custom Domain Configuration
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
+custom_domain_name   = "sagemaker.savantpraxis.com"
 route53_zone_id      = "Z1234567890ABC"
 
 # Or create new zone:
@@ -447,7 +446,7 @@ Follow Part 4 from the Okta SSO Integration section to:
 
 Users will:
 1. Login via Okta
-2. Access SageMaker via custom domain: `https://sagemaker.example.com`
+2. Access SageMaker via custom domain: `https://sagemaker.savantpraxis.com`
 3. Authenticate with SSO credentials
 4. Launch Studio with their assigned permissions
 
@@ -461,13 +460,13 @@ Users will:
 
 ```bash
 # Check DNS resolution
-dig sagemaker.example.com
+dig sagemaker.savantpraxis.com
 
 # Check SSL certificate
-curl -vI https://sagemaker.example.com 2>&1 | grep -A 10 "SSL certificate"
+curl -vI https://sagemaker.savantpraxis.com 2>&1 | grep -A 10 "SSL certificate"
 
 # Verify HTTPS redirect
-curl -I http://sagemaker.example.com
+curl -I http://sagemaker.savantpraxis.com
 ```
 
 ### Verify SSO Configuration
@@ -506,7 +505,7 @@ terraform show | grep -A 5 "aws_sagemaker_domain.sleetgale"
    - Launch Studio (user profile auto-created)
 
 3. **Custom Domain:**
-   - Navigate to `https://sagemaker.example.com`
+   - Navigate to `https://sagemaker.savantpraxis.com`
    - Should see valid SSL certificate
    - Should redirect from HTTP to HTTPS
 
@@ -529,7 +528,7 @@ aws route53 list-resource-record-sets --hosted-zone-id Z123... \
 **Issue: Domain not resolving**
 ```bash
 # Check A record exists
-dig sagemaker.example.com
+dig sagemaker.savantpraxis.com
 
 # Solution: Verify ALB is active and DNS record is created
 aws elbv2 describe-load-balancers \

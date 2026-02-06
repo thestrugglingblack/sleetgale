@@ -60,7 +60,8 @@
                     │              │
                     │  A Record:   │
                     │  sagemaker.  │
-                    │  example.com │
+                    │  savantpraxis│
+                    │      .com    │
                     └──────┬───────┘
                            │
 ┌─────────────────────────▼────────────────────────────────────┐
@@ -93,7 +94,7 @@
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │   ACM Certificate                                      │ │
-│  │   - Domain: sagemaker.example.com                      │ │
+│  │   - Domain: sagemaker.savantpraxis.com                 │ │
 │  │   - Validation: DNS (automatic)                        │ │
 │  └────────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────────┘
@@ -140,8 +141,8 @@
 │  │         SageMaker Studio Domain (SSO Mode)             │  │
 │  │                                                        │  │
 │  │  User Profiles (Auto-created on first login):         │  │
-│  │  - john.doe@example.com                                │  │
-│  │  - jane.smith@example.com                              │  │
+│  │  - john.doe@savantpraxis.com                           │  │
+│  │  - jane.smith@savantpraxis.com                         │  │
 │  │                                                        │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                       │                                       │
@@ -190,7 +191,7 @@ Okta Groups:
 │                         │                                      │
 │  ┌──────────────────────▼───────────────────────────────────┐ │
 │  │                  Route 53 DNS                            │ │
-│  │          sagemaker.example.com → ALB                     │ │
+│  │          sagemaker.savantpraxis.com → ALB              │ │
 │  └──────────────────────┬───────────────────────────────────┘ │
 │                         │                                      │
 │  ┌──────────────────────▼───────────────────────────────────┐ │
@@ -295,7 +296,7 @@ Features Combined:
 │    User     │
 └──────┬──────┘
        │
-       │ 1. Navigate to http://sagemaker.example.com
+       │ 1. Navigate to http://sagemaker.savantpraxis.com
        │
        ▼
 ┌──────────────────────┐
@@ -317,14 +318,14 @@ Features Combined:
 │ 5. Redirect to HTTPS │
 └──────┬───────────────┘
        │
-       │ 6. 301 Redirect to https://sagemaker.example.com
+       │ 6. 301 Redirect to https://sagemaker.savantpraxis.com
        │
        ▼
 ┌─────────────┐
 │    User     │
 └──────┬──────┘
        │
-       │ 7. Navigate to https://sagemaker.example.com
+       │ 7. Navigate to https://sagemaker.savantpraxis.com
        │
        ▼
 ┌──────────────────────┐

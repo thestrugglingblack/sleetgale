@@ -56,12 +56,12 @@ terraform apply
 ```bash
 cat > terraform.tfvars << EOF
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
+custom_domain_name   = "sagemaker.savantpraxis.com"
 route53_zone_id      = "Z1234567890ABC"
 EOF
 
 terraform apply
-# Access via: https://sagemaker.example.com
+# Access via: https://sagemaker.savantpraxis.com
 ```
 
 #### With SSO
@@ -89,7 +89,7 @@ domain_name = "sleetgale"
 
 # Custom Domain
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
+custom_domain_name   = "sagemaker.savantpraxis.com"
 route53_zone_id      = "Z1234567890ABC"
 
 # SSO
@@ -122,7 +122,7 @@ aws sso-admin list-instances --query 'Instances[0].IdentityStoreId' --output tex
 
 #### Get Route 53 Zone ID
 ```bash
-aws route53 list-hosted-zones --query 'HostedZones[?Name==`example.com.`].Id' --output text
+aws route53 list-hosted-zones --query 'HostedZones[?Name==`savantpraxis.com.`].Id' --output text
 ```
 
 #### Check SageMaker Domain
@@ -141,7 +141,7 @@ terraform state list
 #### Certificate Validation Stuck
 ```bash
 # Check DNS records
-dig _validation.sagemaker.example.com
+dig _validation.sagemaker.savantpraxis.com
 
 # Wait up to 30 minutes for DNS propagation
 ```

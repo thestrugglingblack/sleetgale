@@ -89,39 +89,39 @@ Create a `terraform.tfvars` file:
 
 ```hcl
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
-create_route53_zone  = true  # or provide route53_zone_id if zone exists
+custom_domain_name   = "sagemaker.savantpraxis.com"
+route53_zone_id      = "Z1234567890ABC"  # Use existing savantpraxis.com zone
 ```
 
 ### 2. DNS Configuration Options
 
-#### Option A: Create New Route 53 Hosted Zone
+#### Option A: Use Existing Route 53 Zone (Recommended)
+
+For savantpraxis.com domain:
 
 ```hcl
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
-create_route53_zone  = true
+custom_domain_name   = "sagemaker.savantpraxis.com"
+route53_zone_id      = "Z1234567890ABC"  # Your existing savantpraxis.com zone ID
 ```
 
-After deployment, configure your domain registrar with the name servers from the output:
+Find your zone ID with:
 
 ```bash
-terraform output route53_zone_nameservers
+aws route53 list-hosted-zones --query 'HostedZones[?Name==`savantpraxis.com.`].Id' --output text
 ```
 
 #### Option B: Use Existing Route 53 Zone
 
-```hcl
-enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
-route53_zone_id      = "Z1234567890ABC"  # Your existing zone ID
-```
+Delete this duplicate section as it's now covered in Option A.
 
-#### Option C: Use Existing ACM Certificate
+#### Option B: Use Existing ACM Certificate
+
+If you already have a certificate for savantpraxis.com:
 
 ```hcl
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
+custom_domain_name   = "sagemaker.savantpraxis.com"
 certificate_arn      = "arn:aws:acm:us-east-1:123456789012:certificate/..."
 route53_zone_id      = "Z1234567890ABC"
 ```
@@ -144,7 +144,7 @@ The configuration will:
 Once deployed, access SageMaker Studio at:
 
 ```
-https://sagemaker.example.com
+https://sagemaker.savantpraxis.com
 ```
 
 ## Okta SSO Integration
@@ -243,8 +243,8 @@ You can enable both features simultaneously:
 ```hcl
 # Custom Domain
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
-create_route53_zone  = true
+custom_domain_name   = "sagemaker.savantpraxis.com"
+route53_zone_id      = "Z1234567890ABC"  # Use existing savantpraxis.com zone
 
 # Okta SSO
 enable_sso              = true
@@ -352,7 +352,7 @@ User → Okta (SAML) → AWS IAM Identity Center
 ### Custom Domain Issues
 
 **Certificate Validation Pending**:
-- Check DNS propagation: `dig CNAME _validation.sagemaker.example.com`
+- Check DNS propagation: `dig CNAME _validation.sagemaker.savantpraxis.com`
 - Verify Route 53 records were created
 - Wait up to 30 minutes for DNS propagation
 

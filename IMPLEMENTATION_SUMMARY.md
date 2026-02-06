@@ -14,7 +14,7 @@ This document summarizes the implementation of custom domain, SSL, and Okta SSO 
 **Enable with:**
 ```hcl
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
+custom_domain_name   = "sagemaker.savantpraxis.com"
 ```
 
 ### 2. Okta SSO Integration (Optional Feature)
@@ -156,7 +156,7 @@ okta_idp_metadata_url   = "https://dev-....okta.com/app/.../sso/saml/metadata"
 ### Example 2: Custom Domain Only
 ```hcl
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
+custom_domain_name   = "sagemaker.savantpraxis.com"
 route53_zone_id      = "Z1234567890ABC"
 ```
 
@@ -172,7 +172,7 @@ okta_idp_metadata_url   = "https://dev-12345678.okta.com/app/exk.../sso/saml/met
 ```hcl
 # Custom Domain
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.example.com"
+custom_domain_name   = "sagemaker.savantpraxis.com"
 route53_zone_id      = "Z1234567890ABC"
 
 # Okta SSO

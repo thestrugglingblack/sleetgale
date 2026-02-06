@@ -36,7 +36,7 @@ variable "enable_custom_domain" {
 }
 
 variable "custom_domain_name" {
-  description = "Custom domain name for SageMaker Studio (e.g., sagemaker.example.com)"
+  description = "Custom domain name for SageMaker Studio (e.g., sagemaker.savantpraxis.com)"
   type        = string
   default     = ""
 }

@@ -18,7 +18,7 @@
 # enable_custom_domain = false
 
 # Custom domain name for SageMaker Studio
-# custom_domain_name = "sagemaker.example.com"
+# custom_domain_name = "sagemaker.savantpraxis.com"
 
 # Route 53 hosted zone ID (if using existing zone)
 # route53_zone_id = "Z1234567890ABC"
