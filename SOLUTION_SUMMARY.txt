@@ -1,0 +1,182 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║                  IAM PERMISSION POLICY FOR ROUTE 53 ERROR                    ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+YOUR ERROR:
+───────────
+  Error: User arn:aws:iam::378737770782:user/thestrugglingblack is not 
+  authorized to perform: route53:ListTagsForResource on resource:
+  arn:aws:route53:::hostedzone/Z05687192QVMDJJL9QM6A
+
+ROOT CAUSE:
+───────────
+  Your IAM user lacks the route53:ListTagsForResource permission that Terraform
+  needs to read Route 53 hosted zone information.
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                           SOLUTION #1: AWS CLI                                ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+Copy and paste this command:
+
+  aws iam put-user-policy \
+    --user-name thestrugglingblack \
+    --policy-name Route53ReadAccess \
+    --policy-document '{
+      "Version": "2012-10-17",
+      "Statement": [{
+        "Effect": "Allow",
+        "Action": [
+          "route53:GetHostedZone",
+          "route53:ListHostedZones",
+          "route53:ListResourceRecordSets",
+          "route53:GetChange",
+          "route53:ListTagsForResource"
+        ],
+        "Resource": "*"
+      }]
+    }'
+
+Then:
+  1. Wait 10 seconds for IAM changes to propagate
+  2. Run: terraform plan
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                        SOLUTION #2: AWS CONSOLE                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+Steps:
+  1. Go to AWS Console → IAM → Users
+  2. Click on "thestrugglingblack"
+  3. Click "Add permissions" → "Create inline policy"
+  4. Click "JSON" tab
+  5. Paste the policy below
+  6. Name it: "Route53ReadAccess"
+  7. Click "Create policy"
+
+Policy to paste:
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "route53:GetHostedZone",
+        "route53:ListHostedZones",
+        "route53:ListResourceRecordSets",
+        "route53:GetChange",
+        "route53:ListTagsForResource"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                   SOLUTION #3: IAM GROUP (RECOMMENDED)                        ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+If you use IAM groups (best practice):
+
+  aws iam put-group-policy \
+    --group-name YOUR_GROUP_NAME \
+    --policy-name Route53ReadAccess \
+    --policy-document file://policies/route53-read-policy.json
+
+This applies the policy to all users in the group.
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                           VERIFICATION STEPS                                  ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+After applying the policy:
+
+  # 1. Verify it was attached
+  aws iam list-user-policies --user-name thestrugglingblack
+
+  # 2. View the policy details (optional)
+  aws iam get-user-policy \
+    --user-name thestrugglingblack \
+    --policy-name Route53ReadAccess
+
+  # 3. Verify your identity
+  aws sts get-caller-identity
+
+  # 4. Wait 10 seconds, then retry
+  terraform plan
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    IF YOU NEED MORE PERMISSIONS                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+This policy is the minimal fix. For complete Sleetgale deployment:
+
+  # Apply the complete policy with all permissions
+  aws iam put-user-policy \
+    --user-name thestrugglingblack \
+    --policy-name SleetgaleTerraformPolicy \
+    --policy-document file://policies/sleetgale-complete-policy.json
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                         DOCUMENTATION AVAILABLE                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+  📄 QUICK_FIX_ROUTE53_ERROR.md
+     → Step-by-step guide specifically for this error
+
+  📄 IAM_PERMISSIONS.md
+     → Complete permission documentation for all features
+     → Breakdown by deployment mode (basic/custom domain/SSO)
+     → Security best practices
+
+  📁 policies/
+     ├── route53-read-policy.json
+     │   → Minimal fix for this error (ready to use)
+     ├── sleetgale-complete-policy.json
+     │   → All permissions for full deployment
+     └── README.md
+         → Detailed usage instructions for all methods
+
+  📄 README.md, SETUP.md, QUICK_REFERENCE.md
+     → Updated with IAM guidance and troubleshooting
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                           TROUBLESHOOTING                                     ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+Policy not working?
+  • Wait 10-30 seconds for IAM propagation
+  • Verify correct AWS credentials: aws sts get-caller-identity
+  • Check policy is attached: aws iam list-user-policies --user-name thestrugglingblack
+
+Still getting errors?
+  • Check for deny policies or SCPs
+  • Check for permission boundaries
+  • See SETUP.md troubleshooting section
+
+Different permission error?
+  • Note the exact action from the error (e.g., "acm:RequestCertificate")
+  • See IAM_PERMISSIONS.md for that service
+  • Add the action to your policy
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                              QUICK LINKS                                      ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+  Fastest Fix:         QUICK_FIX_ROUTE53_ERROR.md
+  Complete Guide:      IAM_PERMISSIONS.md
+  Policy Files:        policies/README.md
+  Setup Guide:         SETUP.md
+  Troubleshooting:     SETUP.md (Common Issues section)
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                             YOU'RE ALL SET!                                   ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+Apply the policy above, wait 10 seconds, then run: terraform plan
+
+For questions or issues, see the documentation files listed above.
+
