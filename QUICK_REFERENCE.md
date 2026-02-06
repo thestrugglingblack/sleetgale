@@ -108,6 +108,7 @@ okta_idp_metadata_url   = "https://dev-....okta.com/app/.../metadata"
 | **OKTA_SETUP.md** | Okta SAML configuration reference |
 | **ARCHITECTURE.md** | Architecture diagrams & flows |
 | **IMPLEMENTATION_SUMMARY.md** | Complete implementation details |
+| **IAM_PERMISSIONS.md** | Required AWS IAM permissions and policies |
 
 ### Common Tasks
 
@@ -137,6 +138,18 @@ terraform state list
 ```
 
 ### Troubleshooting
+
+#### IAM Permission Errors
+```bash
+# Route53 access denied error
+# Add Route53 permissions - see IAM_PERMISSIONS.md
+
+# Quick check current identity
+aws sts get-caller-identity
+
+# Check user policies
+aws iam list-user-policies --user-name YOUR_USERNAME
+```
 
 #### Certificate Validation Stuck
 ```bash

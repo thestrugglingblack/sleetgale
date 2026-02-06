@@ -32,7 +32,10 @@ This Terraform configuration creates a SageMaker Studio environment with:
 
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.0
 - AWS CLI configured with appropriate credentials
-- AWS account with permissions to create SageMaker, VPC, IAM, and S3 resources
+- AWS account with appropriate IAM permissions (see [IAM_PERMISSIONS.md](IAM_PERMISSIONS.md) for details)
+  - Basic deployment: SageMaker, VPC, IAM, and S3 permissions
+  - Custom domain: Route 53 and ACM permissions (including `route53:ListTagsForResource`)
+  - SSO: AWS IAM Identity Center permissions
 - **For Custom Domain**: 
   - Domain name registered (or Route 53 hosted zone)
   - DNS access to create validation records
@@ -391,7 +394,25 @@ User → Okta (SAML) → AWS IAM Identity Center
 - Run `terraform validate` to check syntax
 - Ensure AWS credentials are configured
 - Check AWS service quotas and limits
-- Review IAM permissions for Terraform
+- Review IAM permissions for Terraform (see [IAM_PERMISSIONS.md](IAM_PERMISSIONS.md))
+
+**IAM Permission Errors**:
+
+Common Terraform permission errors and solutions:
+
+- **`route53:ListTagsForResource` error**: Add Route 53 read permissions to your IAM user/group
+  ```bash
+  # Quick fix - apply Route 53 permissions
+  aws iam put-user-policy \
+    --user-name YOUR_USERNAME \
+    --policy-name Route53Access \
+    --policy-document file://route53-policy.json
+  ```
+- **ACM certificate errors**: Add ACM permissions
+- **VPC/Subnet errors**: Add EC2 VPC permissions
+- **See [IAM_PERMISSIONS.md](IAM_PERMISSIONS.md)** for complete permission requirements and policy examples
+- Verify your current identity: `aws sts get-caller-identity`
+- Check attached policies: `aws iam list-user-policies --user-name YOUR_USERNAME`
 
 **High Costs**:
 - Stop unused SageMaker apps in the console

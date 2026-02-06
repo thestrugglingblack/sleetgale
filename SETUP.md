@@ -21,7 +21,9 @@ This is the simplest and most cost-effective setup. Perfect for development and 
 
 - AWS CLI installed and configured
 - Terraform >= 1.0 installed
-- AWS account with appropriate permissions
+- AWS account with appropriate permissions (see [IAM_PERMISSIONS.md](IAM_PERMISSIONS.md))
+  - For custom domain: Route 53 permissions including `route53:ListTagsForResource`
+  - For basic setup: SageMaker, VPC, IAM, and S3 permissions
 
 ### Steps
 
@@ -594,6 +596,32 @@ aws sagemaker describe-domain \
 ```
 
 ### Terraform Issues
+
+**Issue: "route53:ListTagsForResource" Access Denied**
+```
+Error: User is not authorized to perform: route53:ListTagsForResource
+```
+```bash
+# Solution: Add Route 53 permissions to your IAM user/group
+# See IAM_PERMISSIONS.md for the complete policy
+
+# Quick fix example:
+aws iam put-user-policy \
+  --user-name YOUR_USERNAME \
+  --policy-name Route53TagsAccess \
+  --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Allow",
+      "Action": [
+        "route53:ListTagsForResource",
+        "route53:GetHostedZone",
+        "route53:ListHostedZones"
+      ],
+      "Resource": "*"
+    }]
+  }'
+```
 
 **Issue: "Error creating SageMaker Domain"**
 ```
