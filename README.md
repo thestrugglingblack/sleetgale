@@ -221,6 +221,50 @@ https://sagemaker.savantpraxis.com
 
 ## Okta SSO Integration
 
+Two methods are available for Okta integration:
+
+### Method 1: ALB with Okta OIDC (Recommended - Simpler Setup)
+
+Direct ALB integration with Okta using OpenID Connect. **Best for single account deployments.**
+
+**Setup Time:** 15-20 minutes
+
+1. **Create Okta OIDC Application**:
+   - Okta Admin Console → Applications → Create App Integration
+   - Select: **OIDC - OpenID Connect** → **Web Application**
+   - Sign-in redirect URI: `https://your-domain.com/oauth2/idpresponse`
+
+2. **Configure Terraform**:
+   ```hcl
+   enable_custom_domain = true
+   custom_domain_name   = "analysis.savantpraxis.com"
+   route53_zone_id      = "Z1234567890ABC"
+   
+   # Enable Okta OIDC authentication
+   enable_okta_auth             = true
+   okta_issuer_url              = "https://dev-12345678.okta.com/oauth2/default"
+   okta_client_id               = "0oa..."
+   okta_client_secret           = "your-secret"
+   okta_authorization_endpoint  = "https://dev-12345678.okta.com/oauth2/default/v1/authorize"
+   okta_token_endpoint          = "https://dev-12345678.okta.com/oauth2/default/v1/token"
+   okta_user_info_endpoint      = "https://dev-12345678.okta.com/oauth2/default/v1/userinfo"
+   ```
+
+3. **Deploy**:
+   ```bash
+   terraform apply
+   ```
+
+**How it works:** ALB authenticates users with Okta before routing to Lambda. Lambda receives authenticated user identity and creates personalized presigned URLs.
+
+📖 **Complete Guide**: [OKTA_LAMBDA_INTEGRATION.md](OKTA_LAMBDA_INTEGRATION.md)
+
+### Method 2: IAM Identity Center + Okta SAML (Enterprise Setup)
+
+AWS IAM Identity Center acts as SAML bridge between Okta and AWS. **Best for multi-account deployments.**
+
+**Setup Time:** 30-45 minutes
+
 To enable Okta-based authentication:
 
 ### Prerequisites

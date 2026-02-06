@@ -165,9 +165,33 @@ resource "aws_lb_listener" "https" {
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = local.certificate_arn
 
+  # Okta OIDC Authentication (if enabled)
+  dynamic "default_action" {
+    for_each = var.enable_okta_auth ? [1] : []
+    content {
+      type = "authenticate-oidc"
+      order = 1
+
+      authenticate_oidc {
+        issuer                       = var.okta_issuer_url
+        authorization_endpoint       = var.okta_authorization_endpoint
+        token_endpoint               = var.okta_token_endpoint
+        user_info_endpoint           = var.okta_user_info_endpoint
+        client_id                    = var.okta_client_id
+        client_secret                = var.okta_client_secret
+        session_cookie_name          = "AWSELBAuthSessionCookie"
+        session_timeout              = var.okta_session_timeout
+        scope                        = "openid email profile"
+        on_unauthenticated_request   = "authenticate"
+      }
+    }
+  }
+
+  # Forward to Lambda (always present, runs after authentication if enabled)
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.sagemaker_tg[0].arn
+    order            = var.enable_okta_auth ? 2 : 1
   }
 }
 

@@ -1,11 +1,13 @@
 """
 SageMaker Studio Portal - Lambda Handler
 Serverless alternative to ECS for cost optimization
+Supports Okta OIDC authentication via ALB
 """
 
 import json
 import boto3
 import os
+import base64
 from urllib.parse import parse_qs
 
 # Configuration from environment variables
@@ -16,6 +18,87 @@ SESSION_DURATION = int(os.environ.get('SESSION_DURATION', '43200'))  # 12 hours
 
 # Initialize SageMaker client
 sagemaker = boto3.client('sagemaker', region_name=AWS_REGION)
+
+
+def get_user_from_alb_headers(event):
+    """
+    Extract authenticated user from ALB OIDC headers
+    
+    When ALB is configured with Okta OIDC authentication, it adds headers:
+    - x-amzn-oidc-identity: user email/username
+    - x-amzn-oidc-data: JWT with user claims
+    
+    This function extracts the user identity and converts it to a valid
+    SageMaker user profile name.
+    """
+    headers = event.get('headers', {})
+    
+    # Try to get user identity from ALB OIDC headers (case-insensitive)
+    headers_lower = {k.lower(): v for k, v in headers.items()}
+    
+    user_email = headers_lower.get('x-amzn-oidc-identity')
+    
+    if user_email:
+        print(f"Authenticated user from ALB: {user_email}")
+        
+        # Convert email to valid SageMaker user profile name
+        # user@company.com -> user-company-com
+        # SageMaker profile names: alphanumeric and hyphens only
+        user_profile = user_email.replace('@', '-').replace('.', '-').lower()
+        
+        # Ensure profile name doesn't exceed 63 characters (SageMaker limit)
+        if len(user_profile) > 63:
+            # Use first part of email before @ plus hash
+            email_parts = user_email.split('@')
+            user_profile = email_parts[0][:50] + '-user'
+        
+        print(f"Using SageMaker user profile: {user_profile}")
+        return user_profile
+    
+    # No authenticated user from ALB, use default
+    print(f"No ALB authentication detected, using default profile: {DEFAULT_USER_PROFILE}")
+    return DEFAULT_USER_PROFILE
+
+
+def get_or_create_user_profile(domain_id, user_profile_name):
+    """
+    Get existing user profile or return info about creating one
+    
+    In SSO mode, profiles are auto-created on first access.
+    In IAM mode, profiles must be pre-created.
+    """
+    try:
+        # Check if profile exists
+        response = sagemaker.describe_user_profile(
+            DomainId=domain_id,
+            UserProfileName=user_profile_name
+        )
+        print(f"User profile exists: {user_profile_name}")
+        return user_profile_name, True
+        
+    except sagemaker.exceptions.ResourceNotFound:
+        print(f"User profile not found: {user_profile_name}")
+        
+        # Check auth mode
+        try:
+            domain = sagemaker.describe_domain(DomainId=domain_id)
+            auth_mode = domain.get('AuthMode', 'IAM')
+            
+            if auth_mode == 'SSO':
+                print("SSO mode: Profile will be auto-created on first Studio access")
+                return user_profile_name, False
+            else:
+                print(f"IAM mode: Profile must be pre-created for user {user_profile_name}")
+                # Fall back to default profile
+                return DEFAULT_USER_PROFILE, False
+                
+        except Exception as e:
+            print(f"Error checking domain auth mode: {str(e)}")
+            return DEFAULT_USER_PROFILE, False
+            
+    except Exception as e:
+        print(f"Error checking user profile: {str(e)}")
+        return DEFAULT_USER_PROFILE, False
 
 # HTML template for the portal
 HTML_TEMPLATE = """<!DOCTYPE html>
@@ -196,10 +279,21 @@ def lambda_handler(event, context):
     # Launch endpoint - generate presigned URL
     if http_method == 'POST' or query_params.get('action') == 'launch':
         try:
+            # Extract user from ALB headers (if Okta OIDC is configured)
+            user_profile = get_user_from_alb_headers(event)
+            
+            # Check if profile exists (handles both SSO and IAM modes)
+            user_profile, profile_exists = get_or_create_user_profile(
+                SAGEMAKER_DOMAIN_ID,
+                user_profile
+            )
+            
+            print(f"Generating presigned URL for user: {user_profile}")
+            
             # Generate presigned URL
             presigned_response = sagemaker.create_presigned_domain_url(
                 DomainId=SAGEMAKER_DOMAIN_ID,
-                UserProfileName=DEFAULT_USER_PROFILE,
+                UserProfileName=user_profile,
                 SessionExpirationDurationInSeconds=SESSION_DURATION
             )
             
@@ -208,11 +302,22 @@ def lambda_handler(event, context):
             if not authorized_url:
                 raise Exception("Failed to generate presigned URL")
             
-            return response(200, {'url': authorized_url}, is_alb)
+            print(f"Successfully generated presigned URL for {user_profile}")
+            return response(200, {
+                'url': authorized_url,
+                'user_profile': user_profile,
+                'profile_exists': profile_exists
+            }, is_alb)
             
         except Exception as e:
-            print(f"Error generating presigned URL: {str(e)}")
-            return response(500, {'error': str(e)}, is_alb)
+            error_message = str(e)
+            print(f"Error generating presigned URL: {error_message}")
+            
+            # Provide helpful error messages
+            if 'does not exist' in error_message or 'ResourceNotFound' in error_message:
+                error_message = f"User profile not found. Please create profile '{user_profile}' or contact your administrator."
+            
+            return response(500, {'error': error_message}, is_alb)
     
     # Default: serve HTML portal page
     html = HTML_TEMPLATE.format(

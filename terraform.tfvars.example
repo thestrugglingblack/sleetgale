@@ -50,3 +50,31 @@
 # sso_admin_group_name = "SageMakerAdmins"
 # sso_user_group_name = "SageMakerUsers"
 
+# ========================================
+# Okta OIDC Configuration (Alternative to SAML)
+# ========================================
+# Enable Okta OIDC authentication via ALB (default: false)
+# This is an alternative to SSO SAML for simpler single-account setups
+# enable_okta_auth = false
+
+# Okta issuer URL (from your Okta tenant)
+# okta_issuer_url = "https://dev-12345678.okta.com/oauth2/default"
+
+# Okta OIDC application client ID (from Okta app settings)
+# okta_client_id = "0oa1234567890abcdef"
+
+# Okta OIDC application client secret (from Okta app settings)
+# okta_client_secret = "your-client-secret-here"
+
+# Okta authorization endpoint
+# okta_authorization_endpoint = "https://dev-12345678.okta.com/oauth2/default/v1/authorize"
+
+# Okta token endpoint
+# okta_token_endpoint = "https://dev-12345678.okta.com/oauth2/default/v1/token"
+
+# Okta user info endpoint  
+# okta_user_info_endpoint = "https://dev-12345678.okta.com/oauth2/default/v1/userinfo"
+
+# Okta session timeout in seconds (default: 604800 = 7 days)
+# okta_session_timeout = 604800
+

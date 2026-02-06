@@ -95,3 +95,54 @@ variable "sso_user_group_name" {
   type        = string
   default     = "SageMakerUsers"
 }
+
+# Okta OIDC Configuration (Alternative to SAML)
+variable "enable_okta_auth" {
+  description = "Enable Okta OIDC authentication via ALB (alternative to SSO SAML)"
+  type        = bool
+  default     = false
+}
+
+variable "okta_issuer_url" {
+  description = "Okta issuer URL (e.g., https://dev-12345678.okta.com/oauth2/default)"
+  type        = string
+  default     = ""
+}
+
+variable "okta_client_id" {
+  description = "Okta OIDC application client ID"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "okta_client_secret" {
+  description = "Okta OIDC application client secret"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "okta_authorization_endpoint" {
+  description = "Okta authorization endpoint (e.g., https://dev-12345678.okta.com/oauth2/default/v1/authorize)"
+  type        = string
+  default     = ""
+}
+
+variable "okta_token_endpoint" {
+  description = "Okta token endpoint (e.g., https://dev-12345678.okta.com/oauth2/default/v1/token)"
+  type        = string
+  default     = ""
+}
+
+variable "okta_user_info_endpoint" {
+  description = "Okta user info endpoint (e.g., https://dev-12345678.okta.com/oauth2/default/v1/userinfo)"
+  type        = string
+  default     = ""
+}
+
+variable "okta_session_timeout" {
+  description = "Okta authentication session timeout in seconds (default: 604800 = 7 days)"
+  type        = number
+  default     = 604800
+}
