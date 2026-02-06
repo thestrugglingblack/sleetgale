@@ -173,6 +173,11 @@ If you need to use an external DNS provider:
 
 Enable enterprise single sign-on with Okta SAML 2.0.
 
+**Important**: This setup uses AWS IAM Identity Center (formerly AWS SSO) to integrate with Okta. 
+IAM Identity Center manages the SAML trust relationship, so you don't need to manually create 
+IAM SAML providers. If you need standalone Okta SAML without IAM Identity Center, additional 
+manual configuration in IAM will be required (see sso.tf comments).
+
 ### Prerequisites
 
 - Okta account with admin access
