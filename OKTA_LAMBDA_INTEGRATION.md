@@ -5,7 +5,7 @@
 The Lambda portal solution is **fully compatible** with Okta SSO authentication. The integration provides a seamless experience where users:
 
 1. Authenticate once via Okta
-2. Access the custom domain (e.g., analysis.savantpraxis.com)
+2. Access the custom domain (e.g., analysis.yourcompany.com)
 3. Automatically launch SageMaker Studio with their identity
 
 ## Architecture
@@ -15,7 +15,7 @@ The Lambda portal solution is **fully compatible** with Okta SSO authentication.
 │  User   │
 └────┬────┘
      │ 1. Access custom domain
-     │    https://analysis.savantpraxis.com
+     │    https://analysis.yourcompany.com
      ▼
 ┌─────────────────────────────┐
 │  Application Load Balancer  │
@@ -92,8 +92,8 @@ Configuration:
 ```
 App Name: SageMaker Studio Portal
 Grant Type: ✓ Authorization Code
-Sign-in redirect URI: https://analysis.savantpraxis.com/oauth2/idpresponse
-Sign-out redirect URI: https://analysis.savantpraxis.com
+Sign-in redirect URI: https://analysis.yourcompany.com/oauth2/idpresponse
+Sign-out redirect URI: https://analysis.yourcompany.com
 Controlled Access: (assign groups/users as needed)
 ```
 
@@ -135,7 +135,7 @@ aws elbv2 describe-listeners \
 ### Step 4: Test Authentication Flow
 
 1. Open browser (incognito/private mode)
-2. Navigate to: `https://analysis.savantpraxis.com`
+2. Navigate to: `https://analysis.yourcompany.com`
 3. You'll be redirected to Okta login
 4. Enter Okta credentials
 5. After authentication, you'll see the portal
@@ -145,7 +145,7 @@ aws elbv2 describe-listeners \
 ### How It Works (Method 1)
 
 ```
-1. User → https://analysis.savantpraxis.com
+1. User → https://analysis.yourcompany.com
    ↓
 2. ALB checks authentication cookie
    ↓ (not authenticated)
@@ -325,7 +325,7 @@ sso_identity_store_id = "d-..."
 ```bash
 # 1. Clear browser cookies/use incognito
 # 2. Access custom domain
-curl -I https://analysis.savantpraxis.com
+curl -I https://analysis.yourcompany.com
 
 # Expected: 302 redirect to Okta if using ALB OIDC
 # Expected: 200 OK if using SSO (auth happens in SageMaker)
@@ -422,7 +422,7 @@ aws sagemaker create-user-profile \
 **Solution:**
 Verify redirect URI in Okta exactly matches:
 ```
-https://analysis.savantpraxis.com/oauth2/idpresponse
+https://analysis.yourcompany.com/oauth2/idpresponse
 ```
 
 ### Issue: Lambda can't extract user identity
@@ -484,8 +484,8 @@ Your setup already supports Okta! Just configure the SAML connection in IAM Iden
 # terraform.tfvars
 domain_name            = "sleetgale"
 enable_custom_domain   = true
-custom_domain_name     = "analysis.savantpraxis.com"
-route53_zone_id        = "Z05687192QVMDJJL9QM6A"
+custom_domain_name     = "analysis.yourcompany.com"
+route53_zone_id        = "Z1234567890ABC"
 
 # Okta OIDC
 enable_okta_auth             = true
@@ -504,8 +504,8 @@ okta_session_timeout         = 604800  # 7 days
 # terraform.tfvars
 domain_name            = "sleetgale"
 enable_custom_domain   = true
-custom_domain_name     = "analysis.savantpraxis.com"
-route53_zone_id        = "Z05687192QVMDJJL9QM6A"
+custom_domain_name     = "analysis.yourcompany.com"
+route53_zone_id        = "Z1234567890ABC"
 
 # SSO with Okta SAML
 enable_sso               = true

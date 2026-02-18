@@ -207,7 +207,7 @@ When using custom domain features (`enable_custom_domain = true`), you need addi
 
 The specific error you're encountering is:
 ```
-User is not authorized to perform: route53:ListTagsForResource on resource: arn:aws:route53:::hostedzone/Z05687192QVMDJJL9QM6A
+User is not authorized to perform: route53:ListTagsForResource on resource: arn:aws:route53:::hostedzone/Z1234567890ABC
 ```
 
 This requires the `route53:ListTagsForResource` permission, which is included in the Route 53 policy above.
@@ -363,7 +363,7 @@ For a complete deployment with all features (Basic + Custom Domain + SSO), you c
 ### Option 1: Update IAM User Policy
 
 1. **AWS Console → IAM → Users**
-2. Select your user (e.g., `thestrugglingblack`)
+2. Select your user (e.g., `your-iam-user`)
 3. Click **"Add permissions"** → **"Add inline policy"**
 4. Select **"JSON"** tab
 5. Paste the appropriate policy from above
@@ -392,7 +392,7 @@ To add the policy via AWS CLI:
 
 # For inline user policy:
 aws iam put-user-policy \
-  --user-name thestrugglingblack \
+  --user-name your-iam-user \
   --policy-name SleetgaleTerraformPolicy \
   --policy-document file://sleetgale-policy.json
 
@@ -429,7 +429,7 @@ Then apply it:
 
 ```bash
 aws iam put-user-policy \
-  --user-name thestrugglingblack \
+  --user-name your-iam-user \
   --policy-name Route53TagsAccess \
   --policy-document file://route53-fix-policy.json
 ```
@@ -448,8 +448,8 @@ aws iam put-user-policy \
 
 1. **Check Policy Attachment**: Ensure the policy is attached to your user or group
    ```bash
-   aws iam list-user-policies --user-name thestrugglingblack
-   aws iam list-attached-user-policies --user-name thestrugglingblack
+   aws iam list-user-policies --user-name your-iam-user
+   aws iam list-attached-user-policies --user-name your-iam-user
    ```
 
 2. **Verify Credentials**: Make sure you're using the correct AWS credentials

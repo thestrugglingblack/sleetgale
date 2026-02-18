@@ -6,7 +6,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/thestrugglingblack/sleetgale.git
+git clone https://github.com/your-iam-user/sleetgale.git
 cd sleetgale
 
 # Initialize Terraform
@@ -56,12 +56,12 @@ terraform apply
 ```bash
 cat > terraform.tfvars << EOF
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.savantpraxis.com"
+custom_domain_name   = "sagemaker.yourcompany.com"
 route53_zone_id      = "Z1234567890ABC"
 EOF
 
 terraform apply
-# Access via: https://sagemaker.savantpraxis.com
+# Access via: https://sagemaker.yourcompany.com
 ```
 
 #### With SSO
@@ -89,7 +89,7 @@ domain_name = "sleetgale"
 
 # Custom Domain
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.savantpraxis.com"
+custom_domain_name   = "sagemaker.yourcompany.com"
 route53_zone_id      = "Z1234567890ABC"
 
 # SSO
@@ -123,7 +123,7 @@ aws sso-admin list-instances --query 'Instances[0].IdentityStoreId' --output tex
 
 #### Get Route 53 Zone ID
 ```bash
-aws route53 list-hosted-zones --query 'HostedZones[?Name==`savantpraxis.com.`].Id' --output text
+aws route53 list-hosted-zones --query 'HostedZones[?Name==`yourcompany.com.`].Id' --output text
 ```
 
 #### Check SageMaker Domain
@@ -170,7 +170,7 @@ aws acm describe-certificate \
 #### Certificate Validation Stuck
 ```bash
 # Check DNS records
-dig _validation.sagemaker.savantpraxis.com
+dig _validation.sagemaker.yourcompany.com
 
 # Wait up to 30 minutes for DNS propagation
 ```

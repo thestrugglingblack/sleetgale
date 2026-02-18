@@ -94,7 +94,7 @@
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │   ACM Certificate                                      │ │
-│  │   - Domain: sagemaker.savantpraxis.com                 │ │
+│  │   - Domain: sagemaker.yourcompany.com                 │ │
 │  │   - Validation: DNS (automatic)                        │ │
 │  └────────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────────┘
@@ -141,8 +141,8 @@
 │  │         SageMaker Studio Domain (SSO Mode)             │  │
 │  │                                                        │  │
 │  │  User Profiles (Auto-created on first login):         │  │
-│  │  - john.doe@savantpraxis.com                           │  │
-│  │  - jane.smith@savantpraxis.com                         │  │
+│  │  - john.doe@yourcompany.com                           │  │
+│  │  - jane.smith@yourcompany.com                         │  │
 │  │                                                        │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                       │                                       │
@@ -191,7 +191,7 @@ Okta Groups:
 │                         │                                      │
 │  ┌──────────────────────▼───────────────────────────────────┐ │
 │  │                  Route 53 DNS                            │ │
-│  │          sagemaker.savantpraxis.com → ALB              │ │
+│  │          sagemaker.yourcompany.com → ALB              │ │
 │  └──────────────────────┬───────────────────────────────────┘ │
 │                         │                                      │
 │  ┌──────────────────────▼───────────────────────────────────┐ │
@@ -296,7 +296,7 @@ Features Combined:
 │    User     │
 └──────┬──────┘
        │
-       │ 1. Navigate to http://sagemaker.savantpraxis.com
+       │ 1. Navigate to http://sagemaker.yourcompany.com
        │
        ▼
 ┌──────────────────────┐
@@ -318,14 +318,14 @@ Features Combined:
 │ 5. Redirect to HTTPS │
 └──────┬───────────────┘
        │
-       │ 6. 301 Redirect to https://sagemaker.savantpraxis.com
+       │ 6. 301 Redirect to https://sagemaker.yourcompany.com
        │
        ▼
 ┌─────────────┐
 │    User     │
 └──────┬──────┘
        │
-       │ 7. Navigate to https://sagemaker.savantpraxis.com
+       │ 7. Navigate to https://sagemaker.yourcompany.com
        │
        ▼
 ┌──────────────────────┐

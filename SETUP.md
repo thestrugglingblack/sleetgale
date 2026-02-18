@@ -29,7 +29,7 @@ This is the simplest and most cost-effective setup. Perfect for development and 
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/thestrugglingblack/sleetgale.git
+   git clone https://github.com/your-iam-user/sleetgale.git
    cd sleetgale
    ```
 
@@ -68,7 +68,7 @@ Enable HTTPS access to SageMaker via your own domain name.
 
 ### Prerequisites
 
-- Domain name (e.g., `savantpraxis.com`)
+- Domain name (e.g., `yourcompany.com`)
 - DNS access (Route 53 or external DNS provider)
 - Basic setup completed OR fresh installation
 
@@ -78,8 +78,8 @@ Enable HTTPS access to SageMaker via your own domain name.
 
 **If domain is already in Route 53:**
 ```bash
-# Get your hosted zone ID for savantpraxis.com
-aws route53 list-hosted-zones --query 'HostedZones[?Name==`savantpraxis.com.`].Id' --output text
+# Get your hosted zone ID for yourcompany.com
+aws route53 list-hosted-zones --query 'HostedZones[?Name==`yourcompany.com.`].Id' --output text
 ```
 
 **If domain needs to be added to Route 53:**
@@ -93,9 +93,9 @@ aws route53 list-hosted-zones --query 'HostedZones[?Name==`savantpraxis.com.`].I
 Create a `terraform.tfvars` file:
 
 ```hcl
-# Using existing Route 53 zone for savantpraxis.com
+# Using existing Route 53 zone for yourcompany.com
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.savantpraxis.com"
+custom_domain_name   = "sagemaker.yourcompany.com"
 route53_zone_id      = "Z1234567890ABC"  # Your zone ID from step 1
 
 # Note: create_route53_zone is not needed since we're using an existing zone
@@ -132,7 +132,7 @@ terraform output route53_zone_nameservers
 
 ```bash
 # Wait a few minutes for DNS propagation, then access:
-https://sagemaker.savantpraxis.com
+https://sagemaker.yourcompany.com
 ```
 
 ### Option B: Using Existing Certificate
@@ -142,14 +142,14 @@ If you already have an ACM certificate:
 ```hcl
 # terraform.tfvars
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.savantpraxis.com"
+custom_domain_name   = "sagemaker.yourcompany.com"
 route53_zone_id      = "Z1234567890ABC"
 certificate_arn      = "arn:aws:acm:us-east-1:123456789012:certificate/..."
 ```
 
-### Option C: Using External DNS Provider (Not Recommended for savantpraxis.com)
+### Option C: Using External DNS Provider (Not Recommended for yourcompany.com)
 
-**Note**: For savantpraxis.com, it's recommended to use the existing Route53 zone (Option A) instead of this approach.
+**Note**: For yourcompany.com, it's recommended to use the existing Route53 zone (Option A) instead of this approach.
 
 If you need to use an external DNS provider:
 
@@ -418,7 +418,7 @@ domain_name = "sleetgale-prod"
 
 # Custom Domain Configuration
 enable_custom_domain = true
-custom_domain_name   = "sagemaker.savantpraxis.com"
+custom_domain_name   = "sagemaker.yourcompany.com"
 route53_zone_id      = "Z1234567890ABC"
 
 # Or create new zone:
@@ -455,7 +455,7 @@ Follow Part 4 from the Okta SSO Integration section to:
 
 Users will:
 1. Login via Okta
-2. Access SageMaker via custom domain: `https://sagemaker.savantpraxis.com`
+2. Access SageMaker via custom domain: `https://sagemaker.yourcompany.com`
 3. Authenticate with SSO credentials
 4. Launch Studio with their assigned permissions
 
@@ -469,13 +469,13 @@ Users will:
 
 ```bash
 # Check DNS resolution
-dig sagemaker.savantpraxis.com
+dig sagemaker.yourcompany.com
 
 # Check SSL certificate
-curl -vI https://sagemaker.savantpraxis.com 2>&1 | grep -A 10 "SSL certificate"
+curl -vI https://sagemaker.yourcompany.com 2>&1 | grep -A 10 "SSL certificate"
 
 # Verify HTTPS redirect
-curl -I http://sagemaker.savantpraxis.com
+curl -I http://sagemaker.yourcompany.com
 ```
 
 ### Verify SSO Configuration
@@ -514,7 +514,7 @@ terraform show | grep -A 5 "aws_sagemaker_domain.sleetgale"
    - Launch Studio (user profile auto-created)
 
 3. **Custom Domain:**
-   - Navigate to `https://sagemaker.savantpraxis.com`
+   - Navigate to `https://sagemaker.yourcompany.com`
    - Should see valid SSL certificate
    - Should redirect from HTTP to HTTPS
 
@@ -537,7 +537,7 @@ aws route53 list-resource-record-sets --hosted-zone-id Z123... \
 **Issue: Domain not resolving**
 ```bash
 # Check A record exists
-dig sagemaker.savantpraxis.com
+dig sagemaker.yourcompany.com
 
 # Solution: Verify ALB is active and DNS record is created
 aws elbv2 describe-load-balancers \
