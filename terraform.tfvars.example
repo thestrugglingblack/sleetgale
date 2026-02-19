@@ -51,30 +51,21 @@
 # sso_user_group_name = "SageMakerUsers"
 
 # ========================================
-# Okta OIDC Configuration (Alternative to SAML)
+# Auth0 Configuration (Alternative to SAML)
 # ========================================
-# Enable Okta OIDC authentication via ALB (default: false)
+# Enable Auth0 authentication via ALB (default: false)
 # This is an alternative to SSO SAML for simpler single-account setups
-# enable_okta_auth = false
+# enable_auth0 = false
 
-# Okta issuer URL (from your Okta tenant)
-# okta_issuer_url = "https://dev-12345678.okta.com/oauth2/default"
+# Auth0 domain (from your Auth0 tenant)
+# auth0_domain = "dev-12345678.us.auth0.com"
 
-# Okta OIDC application client ID (from Okta app settings)
-# okta_client_id = "0oa1234567890abcdef"
+# Auth0 application client ID (from Auth0 app settings)
+# auth0_client_id = "AbCdEfGhIjKlMnOpQrSt1234567890"
 
-# Okta OIDC application client secret (from Okta app settings)
-# okta_client_secret = "your-client-secret-here"
+# Auth0 application client secret (from Auth0 app settings)
+# auth0_client_secret = "your-client-secret-here"
 
-# Okta authorization endpoint
-# okta_authorization_endpoint = "https://dev-12345678.okta.com/oauth2/default/v1/authorize"
-
-# Okta token endpoint
-# okta_token_endpoint = "https://dev-12345678.okta.com/oauth2/default/v1/token"
-
-# Okta user info endpoint  
-# okta_user_info_endpoint = "https://dev-12345678.okta.com/oauth2/default/v1/userinfo"
-
-# Okta session timeout in seconds (default: 604800 = 7 days)
-# okta_session_timeout = 604800
+# Auth0 session timeout in seconds (default: 604800 = 7 days)
+# auth0_session_timeout = 604800
 

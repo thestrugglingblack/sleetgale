@@ -165,22 +165,22 @@ resource "aws_lb_listener" "https" {
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = local.certificate_arn
 
-  # Okta OIDC Authentication (if enabled)
+  # Auth0 Authentication (if enabled)
   dynamic "default_action" {
-    for_each = var.enable_okta_auth ? [1] : []
+    for_each = var.enable_auth0 ? [1] : []
     content {
       type = "authenticate-oidc"
       order = 1
 
       authenticate_oidc {
-        issuer                       = var.okta_issuer_url
-        authorization_endpoint       = var.okta_authorization_endpoint
-        token_endpoint               = var.okta_token_endpoint
-        user_info_endpoint           = var.okta_user_info_endpoint
-        client_id                    = var.okta_client_id
-        client_secret                = var.okta_client_secret
+        issuer                       = "https://${var.auth0_domain}/"
+        authorization_endpoint       = "https://${var.auth0_domain}/authorize"
+        token_endpoint               = "https://${var.auth0_domain}/oauth/token"
+        user_info_endpoint           = "https://${var.auth0_domain}/userinfo"
+        client_id                    = var.auth0_client_id
+        client_secret                = var.auth0_client_secret
         session_cookie_name          = "AWSELBAuthSessionCookie"
-        session_timeout              = var.okta_session_timeout
+        session_timeout              = var.auth0_session_timeout
         scope                        = "openid email profile"
         on_unauthenticated_request   = "authenticate"
       }
@@ -191,7 +191,7 @@ resource "aws_lb_listener" "https" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.sagemaker_tg[0].arn
-    order            = var.enable_okta_auth ? 2 : 1
+    order            = var.enable_auth0 ? 2 : 1
   }
 }
 

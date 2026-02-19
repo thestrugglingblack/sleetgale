@@ -96,53 +96,35 @@ variable "sso_user_group_name" {
   default     = "SageMakerUsers"
 }
 
-# Okta OIDC Configuration (Alternative to SAML)
-variable "enable_okta_auth" {
-  description = "Enable Okta OIDC authentication via ALB (alternative to SSO SAML)"
+# Auth0 Authentication Configuration (Alternative to SAML)
+variable "enable_auth0" {
+  description = "Enable Auth0 authentication via ALB (alternative to SSO SAML)"
   type        = bool
   default     = false
 }
 
-variable "okta_issuer_url" {
-  description = "Okta issuer URL (e.g., https://dev-12345678.okta.com/oauth2/default)"
+variable "auth0_domain" {
+  description = "Auth0 domain (e.g., dev-12345678.us.auth0.com)"
   type        = string
   default     = ""
 }
 
-variable "okta_client_id" {
-  description = "Okta OIDC application client ID"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
-variable "okta_client_secret" {
-  description = "Okta OIDC application client secret"
+variable "auth0_client_id" {
+  description = "Auth0 application client ID"
   type        = string
   default     = ""
   sensitive   = true
 }
 
-variable "okta_authorization_endpoint" {
-  description = "Okta authorization endpoint (e.g., https://dev-12345678.okta.com/oauth2/default/v1/authorize)"
+variable "auth0_client_secret" {
+  description = "Auth0 application client secret"
   type        = string
   default     = ""
+  sensitive   = true
 }
 
-variable "okta_token_endpoint" {
-  description = "Okta token endpoint (e.g., https://dev-12345678.okta.com/oauth2/default/v1/token)"
-  type        = string
-  default     = ""
-}
-
-variable "okta_user_info_endpoint" {
-  description = "Okta user info endpoint (e.g., https://dev-12345678.okta.com/oauth2/default/v1/userinfo)"
-  type        = string
-  default     = ""
-}
-
-variable "okta_session_timeout" {
-  description = "Okta authentication session timeout in seconds (default: 604800 = 7 days)"
+variable "auth0_session_timeout" {
+  description = "Auth0 authentication session timeout in seconds (default: 604800 = 7 days)"
   type        = number
   default     = 604800
 }

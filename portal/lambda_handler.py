@@ -1,7 +1,7 @@
 """
 SageMaker Studio Portal - Lambda Handler
 Serverless alternative to ECS for cost optimization
-Supports Okta OIDC authentication via ALB
+Supports Auth0 authentication via ALB
 """
 
 import json
@@ -24,7 +24,7 @@ def get_user_from_alb_headers(event):
     """
     Extract authenticated user from ALB OIDC headers
     
-    When ALB is configured with Okta OIDC authentication, it adds headers:
+    When ALB is configured with Auth0 authentication, it adds headers:
     - x-amzn-oidc-identity: user email/username
     - x-amzn-oidc-data: JWT with user claims
     
@@ -279,7 +279,7 @@ def lambda_handler(event, context):
     # Launch endpoint - generate presigned URL
     if http_method == 'POST' or query_params.get('action') == 'launch':
         try:
-            # Extract user from ALB headers (if Okta OIDC is configured)
+            # Extract user from ALB headers (if Auth0 is configured)
             user_profile = get_user_from_alb_headers(event)
             
             # Check if profile exists (handles both SSO and IAM modes)
