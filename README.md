@@ -178,6 +178,44 @@ The portal:
 
 ## Configuration Options
 
+### Using Existing DNS and SSL Resources (IMPORTANT)
+
+If you already have a Route53 hosted zone and/or ACM certificate, use this configuration to **prevent Terraform from recreating or modifying** your existing resources:
+
+```hcl
+# terraform.tfvars
+enable_custom_domain = true
+custom_domain_name   = "analysis.yourcompany.com"
+
+# Use EXISTING Route53 zone (prevents zone creation)
+create_route53_zone = false  # This is the default, but be explicit
+route53_zone_id     = "Z1234567890ABC"  # Your existing zone ID
+
+# Use EXISTING ACM certificate (prevents cert creation)
+certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+```
+
+**How to find your existing resources:**
+
+```bash
+# Find Route53 Zone ID
+aws route53 list-hosted-zones --query 'HostedZones[?Name==`yourcompany.com.`].[Id,Name]' --output table
+
+# Find ACM Certificate ARN (must be in us-east-1 for ALB)
+aws acm list-certificates --region us-east-1 --query 'CertificateSummaryList[?DomainName==`*.yourcompany.com`].[CertificateArn,DomainName]' --output table
+```
+
+**What Terraform will create:**
+- ✅ Only ONE Route53 A record pointing to the ALB (for your custom_domain_name)
+- ✅ NO new Route53 zone
+- ✅ NO new ACM certificate
+- ✅ NO certificate validation records
+
+**What happens if you DON'T specify these:**
+- ❌ Terraform will create a NEW ACM certificate (and validation records)
+- ❌ Certificate validation will add DNS records to your zone
+- ⚠️ This could conflict with existing certificates
+
 ### Basic SageMaker (No Custom Domain)
 
 If you just want SageMaker Studio without custom domain or Okta:

@@ -42,21 +42,61 @@ variable "custom_domain_name" {
 }
 
 variable "route53_zone_id" {
-  description = "Route 53 hosted zone ID for DNS records. If not provided and create_route53_zone is true, a new zone will be created"
+  description = <<-EOT
+    Route 53 hosted zone ID for DNS records (RECOMMENDED: use existing zone).
+    
+    To use an EXISTING zone (recommended):
+    - Set this to your zone ID (e.g., "Z1234567890ABC")
+    - Set create_route53_zone = false
+    - Terraform will ONLY create an A record for custom_domain_name
+    
+    To create a NEW zone (not recommended):
+    - Leave this empty
+    - Set create_route53_zone = true
+    - Terraform will create and manage the entire zone
+    
+    Find your zone ID: aws route53 list-hosted-zones
+  EOT
   type        = string
   default     = ""
 }
 
 variable "create_route53_zone" {
-  description = "Create a new Route 53 hosted zone for the custom domain"
+  description = <<-EOT
+    Create a new Route 53 hosted zone (default: false).
+    
+    RECOMMENDED: Keep this false and use route53_zone_id instead.
+    
+    Only set to true if:
+    - You don't have an existing Route53 zone
+    - You want Terraform to manage the entire DNS zone
+    - You understand you'll need to update domain registrar nameservers
+  EOT
   type        = bool
   default     = false
 }
 
 variable "certificate_arn" {
-  description = "ARN of existing ACM certificate. If not provided and enable_custom_domain is true, a new certificate will be created"
+  description = <<-EOT
+    ARN of existing ACM certificate (RECOMMENDED: use existing certificate).
+    
+    To use an EXISTING certificate (recommended):
+    - Provide the full ARN of your certificate
+    - Certificate MUST be in us-east-1 region for ALB
+    - Terraform will NOT create a new certificate
+    - Terraform will NOT add validation records to your DNS
+    
+    To create a NEW certificate:
+    - Leave this empty
+    - Terraform will create a new certificate
+    - Terraform will add DNS validation records to your Route53 zone
+    - Certificate validation can take 5-10 minutes
+    
+    Find your certificate ARN: aws acm list-certificates --region us-east-1
+  EOT
   type        = string
   default     = ""
+  sensitive   = false
 }
 
 # Okta SSO Configuration
