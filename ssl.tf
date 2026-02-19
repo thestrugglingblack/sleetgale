@@ -39,7 +39,7 @@ resource "aws_acm_certificate" "sagemaker_cert" {
   validation_method = "DNS"
 
   lifecycle {
-    create_before_destroy = true
+    prevent_destroy = true
   }
 
   tags = {
@@ -154,6 +154,7 @@ resource "aws_lb_target_group" "sagemaker_tg" {
   tags = {
     Name = "${var.domain_name}-tg-lambda"
   }
+
 }
 
 # HTTPS Listener for ALB
