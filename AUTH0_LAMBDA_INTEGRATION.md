@@ -107,17 +107,18 @@ Add to `terraform.tfvars`:
 
 ```hcl
 # Enable Auth0 authentication
-enable_auth0_auth = true
+enable_auth0 = true
 
-# Okta configuration (from Step 1)
-auth0_issuer_url    = "https://dev-12345678.us.auth0.com/oauth"
+# Auth0 configuration (from Step 1)
+auth0_domain        = "dev-12345678.us.auth0.com"
 auth0_client_id     = "AbCdEfGhIjKlMnOpQrSt1234567890"
 auth0_client_secret = "your-client-secret-here"
 
-# Authorization endpoint (from Auth0 app settings)
-auth0_authorization_endpoint = "https://dev-12345678.us.auth0.com/authorize"
-auth0_token_endpoint        = "https://dev-12345678.us.auth0.com/token"
-auth0_user_info_endpoint    = "https://dev-12345678.us.auth0.com/userinfo"
+# Note: Auth0 endpoints are auto-generated from auth0_domain:
+#   - Issuer: https://{auth0_domain}/
+#   - Authorization: https://{auth0_domain}/authorize
+#   - Token: https://{auth0_domain}/oauth/token
+#   - UserInfo: https://{auth0_domain}/userinfo
 ```
 
 ### Step 3: Deploy Okta Integration
@@ -292,16 +293,19 @@ aws sagemaker create-user-profile \
 ### ALB OIDC Variables
 
 ```hcl
-# Enable Okta authentication via ALB
-enable_auth0_auth = true
+# Enable Auth0 authentication via ALB
+enable_auth0 = true
 
 # Auth0 Configuration
-auth0_issuer_url             = "https://dev-12345678.us.auth0.com/oauth"
-auth0_client_id              = "0oa..."
-auth0_client_secret          = "..."
-auth0_authorization_endpoint = "https://dev-12345678.us.auth0.com/authorize"
-auth0_token_endpoint         = "https://dev-12345678.us.auth0.com/token"
-auth0_user_info_endpoint     = "https://dev-12345678.us.auth0.com/userinfo"
+auth0_domain        = "dev-12345678.us.auth0.com"
+auth0_client_id     = "AbCdEfGhIjKlMnOpQrSt1234567890"
+auth0_client_secret = "..."
+
+# Optional: Session timeout (default: 604800 = 7 days)
+auth0_session_timeout = 604800
+
+# Note: Auth0 OIDC endpoints are auto-generated from auth0_domain
+# No need to configure individual endpoints manually
 ```
 
 ### IAM Identity Center + SAML Variables
@@ -453,16 +457,18 @@ Adding Okta authentication has **zero additional AWS cost**:
 
 ### Already Using IAM Mode?
 
-Migrate to Okta authentication:
+Migrate to Auth0 authentication:
 
 ```bash
 # 1. Choose method (ALB OIDC recommended for simplicity)
 
-# 2. Configure Auth0 app
+# 2. Configure Auth0 app in Auth0 Dashboard
 
 # 3. Update terraform.tfvars
-enable_auth0_auth = true
-# Add Okta variables
+enable_auth0 = true
+auth0_domain = "dev-12345678.us.auth0.com"
+auth0_client_id = "AbCdEfGhIjKlMnOpQrSt1234567890"
+auth0_client_secret = "secret-value"
 
 # 4. Apply changes
 terraform apply
@@ -487,15 +493,12 @@ enable_custom_domain   = true
 custom_domain_name     = "analysis.yourcompany.com"
 route53_zone_id        = "Z1234567890ABC"
 
-# Auth0
-enable_auth0_auth             = true
-auth0_issuer_url              = "https://dev-12345678.us.auth0.com/oauth"
-auth0_client_id               = "AbCdEfGhIjKlMnOpQrSt1234567890"
-auth0_client_secret           = "secret-value"
-auth0_authorization_endpoint  = "https://dev-12345678.us.auth0.com/authorize"
-auth0_token_endpoint          = "https://dev-12345678.us.auth0.com/token"
-auth0_user_info_endpoint      = "https://dev-12345678.us.auth0.com/userinfo"
-auth0_session_timeout         = 604800  # 7 days
+# Auth0 Authentication
+enable_auth0          = true
+auth0_domain          = "dev-12345678.us.auth0.com"
+auth0_client_id       = "AbCdEfGhIjKlMnOpQrSt1234567890"
+auth0_client_secret   = "secret-value"
+auth0_session_timeout = 604800  # 7 days (optional)
 ```
 
 ### Example 2: Enterprise (IAM Identity Center + SAML)
