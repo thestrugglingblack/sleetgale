@@ -54,12 +54,13 @@ locals {
 #
 # IMPORTANT: The certificate MUST be in us-east-1 region for use with ALB
 resource "aws_acm_certificate" "sagemaker_cert" {
-  count             = var.enable_custom_domain && var.certificate_arn == "" ? 1 : 0
+  # count             = var.enable_custom_domain && var.certificate_arn == "" ? 1 : 0
+  count = 1
   domain_name       = var.custom_domain_name
   validation_method = "DNS"
 
   lifecycle {
-    create_before_destroy = true
+    prevent_destroy = true
   }
 
   tags = {
@@ -176,6 +177,7 @@ resource "aws_lb_target_group" "sagemaker_tg" {
   tags = {
     Name = "${var.domain_name}-tg-lambda"
   }
+
 }
 
 # HTTPS Listener for ALB
