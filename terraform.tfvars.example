@@ -18,16 +18,43 @@
 # enable_custom_domain = false
 
 # Custom domain name for SageMaker Studio
-# custom_domain_name = "sagemaker.savantpraxis.com"
+# custom_domain_name = "analysis.yourcompany.com"
 
-# Route 53 hosted zone ID (if using existing zone)
+# ----------------------------------------
+# Option A: Use EXISTING Route53 Zone and ACM Certificate (RECOMMENDED)
+# ----------------------------------------
+# This option prevents Terraform from creating or modifying DNS/SSL resources.
+# Use this if you already have a Route53 zone and ACM certificate.
+
+# Existing Route 53 hosted zone ID (get from Route53 console)
 # route53_zone_id = "Z1234567890ABC"
 
-# Create new Route 53 hosted zone (default: false)
+# Existing ACM certificate ARN (get from ACM console, must be in us-east-1)
+# certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+
+# Ensure zone creation is disabled (this is the default)
 # create_route53_zone = false
 
-# Existing ACM certificate ARN (if not creating new certificate)
-# certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+# ----------------------------------------
+# Option B: Let Terraform Create New Resources (NOT RECOMMENDED if you have existing resources)
+# ----------------------------------------
+# Only use this if you DON'T have an existing Route53 zone or ACM certificate.
+# WARNING: This will create NEW resources, not use existing ones.
+
+# To create a NEW Route53 zone (rarely needed)
+# create_route53_zone = true
+# route53_zone_id = ""  # Leave empty when creating new zone
+
+# To create a NEW ACM certificate (will auto-create if certificate_arn is empty)
+# certificate_arn = ""  # Leave empty to auto-create certificate
+
+# ----------------------------------------
+# IMPORTANT NOTES:
+# ----------------------------------------
+# 1. If you have existing DNS and SSL, use Option A to prevent recreation
+# 2. The certificate MUST be in us-east-1 region for ALB
+# 3. The Route53 zone should be for your base domain (e.g., yourcompany.com)
+# 4. DNS validation records will only be created if certificate_arn is empty
 
 # ========================================
 # Okta SSO Configuration
