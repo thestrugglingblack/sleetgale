@@ -1,0 +1,87 @@
+================================================================================
+USING EXISTING DNS AND ACM RESOURCES - QUICK REFERENCE
+================================================================================
+
+PROBLEM:
+--------
+User already has Route53 hosted zone and ACM certificate.
+Don't want Terraform to recreate or modify these existing resources.
+
+SOLUTION:
+---------
+Configure Terraform to USE existing resources instead of creating new ones.
+
+CONFIGURATION (terraform.tfvars):
+----------------------------------
+enable_custom_domain = true
+custom_domain_name   = "analysis.yourcompany.com"
+
+# Use EXISTING Route53 zone (prevents zone creation)
+create_route53_zone = false
+route53_zone_id     = "Z1234567890ABC"  # YOUR existing zone ID
+
+# Use EXISTING ACM certificate (prevents cert creation)
+certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+
+FIND YOUR EXISTING RESOURCES:
+------------------------------
+# Route53 Zone ID
+aws route53 list-hosted-zones --query 'HostedZones[?Name==`yourcompany.com.`].[Id,Name]' --output table
+
+# ACM Certificate ARN (must be in us-east-1)
+aws acm list-certificates --region us-east-1 --query 'CertificateSummaryList[?DomainName==`*.yourcompany.com`].[CertificateArn,DomainName]' --output table
+
+WHAT TERRAFORM WILL CREATE:
+----------------------------
+✅ ONE Route53 A record (custom_domain_name → ALB)
+✅ Application Load Balancer
+✅ HTTPS Listener (using your existing certificate)
+✅ Lambda function
+✅ SageMaker Studio
+✅ VPC and related resources
+
+WHAT TERRAFORM WILL NOT TOUCH:
+-------------------------------
+❌ Route53 hosted zone (uses existing)
+❌ ACM certificate (uses existing)
+❌ Certificate validation records (not needed)
+❌ Other DNS records in your zone
+
+VERIFICATION BEFORE APPLY:
+---------------------------
+terraform plan
+
+Expected resources to CREATE:
+  + aws_route53_record.sagemaker_alb[0]
+  + aws_lb.sagemaker_alb[0]
+  + aws_lb_listener.https[0]
+  + (other VPC, SageMaker, Lambda resources)
+
+Should NOT appear (if they do, STOP and check config):
+  + aws_route53_zone.custom_domain[0]
+  + aws_acm_certificate.sagemaker_cert[0]
+  + aws_route53_record.cert_validation
+  + aws_acm_certificate_validation.sagemaker_cert[0]
+
+BENEFITS:
+---------
+✅ No recreation of existing resources
+✅ Faster deployment (3-5 min vs 10-15 min)
+✅ No DNS conflicts
+✅ No certificate conflicts
+✅ Uses infrastructure you already trust
+
+DOCUMENTATION:
+--------------
+Complete guide: USING_EXISTING_RESOURCES.md
+Quick start: README.md (section "Using Existing DNS and SSL Resources")
+Examples: terraform.tfvars.example
+
+IMPORTANT NOTES:
+----------------
+1. Certificate MUST be in us-east-1 region (ALB requirement)
+2. Certificate should cover your custom_domain_name (exact or wildcard)
+3. Route53 zone should be for base domain (e.g., yourcompany.com, not subdomain)
+4. Only ONE A record will be added to your existing zone
+
+================================================================================

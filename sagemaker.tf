@@ -7,12 +7,12 @@ locals {
 # SageMaker Studio Domain
 resource "aws_sagemaker_domain" "sleetgale" {
   domain_name = var.domain_name
-  auth_mode   = "IAM"
+  auth_mode   = var.enable_sso ? "SSO" : "IAM"
   vpc_id      = aws_vpc.sagemaker_vpc.id
   subnet_ids  = aws_subnet.sagemaker_subnets[*].id
 
   default_user_settings {
-    execution_role  = aws_iam_role.sagemaker_execution_role.arn
+    execution_role  = local.sagemaker_execution_role_arn
     security_groups = [aws_security_group.sagemaker_sg.id]
 
     # Use the cheapest instance type for JupyterServer
@@ -33,7 +33,7 @@ resource "aws_sagemaker_domain" "sleetgale" {
   }
 
   default_space_settings {
-    execution_role = aws_iam_role.sagemaker_execution_role.arn
+    execution_role = local.sagemaker_execution_role_arn
   }
 
   tags = {
@@ -41,13 +41,14 @@ resource "aws_sagemaker_domain" "sleetgale" {
   }
 }
 
-# SageMaker Studio User Profile
+# SageMaker Studio User Profile (only for IAM mode)
 resource "aws_sagemaker_user_profile" "default_user" {
+  count             = var.enable_sso ? 0 : 1
   domain_id         = aws_sagemaker_domain.sleetgale.id
   user_profile_name = "default-user"
 
   user_settings {
-    execution_role  = aws_iam_role.sagemaker_execution_role.arn
+    execution_role  = local.sagemaker_execution_role_arn
     security_groups = [aws_security_group.sagemaker_sg.id]
 
     # Use the cheapest instance types

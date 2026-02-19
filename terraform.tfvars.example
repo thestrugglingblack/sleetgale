@@ -10,3 +10,89 @@
 # VPC Configuration
 # vpc_cidr = "10.0.0.0/16"
 # subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
+
+# ========================================
+# Custom Domain and SSL Configuration
+# ========================================
+# Enable custom domain with SSL (default: false)
+# enable_custom_domain = false
+
+# Custom domain name for SageMaker Studio
+# custom_domain_name = "analysis.yourcompany.com"
+
+# ----------------------------------------
+# Option A: Use EXISTING Route53 Zone and ACM Certificate (RECOMMENDED)
+# ----------------------------------------
+# This option prevents Terraform from creating or modifying DNS/SSL resources.
+# Use this if you already have a Route53 zone and ACM certificate.
+
+# Existing Route 53 hosted zone ID (get from Route53 console)
+# route53_zone_id = "Z1234567890ABC"
+
+# Existing ACM certificate ARN (get from ACM console, must be in us-east-1)
+# certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+
+# Ensure zone creation is disabled (this is the default)
+# create_route53_zone = false
+
+# ----------------------------------------
+# Option B: Let Terraform Create New Resources (NOT RECOMMENDED if you have existing resources)
+# ----------------------------------------
+# Only use this if you DON'T have an existing Route53 zone or ACM certificate.
+# WARNING: This will create NEW resources, not use existing ones.
+
+# To create a NEW Route53 zone (rarely needed)
+# create_route53_zone = true
+# route53_zone_id = ""  # Leave empty when creating new zone
+
+# To create a NEW ACM certificate (will auto-create if certificate_arn is empty)
+# certificate_arn = ""  # Leave empty to auto-create certificate
+
+# ----------------------------------------
+# IMPORTANT NOTES:
+# ----------------------------------------
+# 1. If you have existing DNS and SSL, use Option A to prevent recreation
+# 2. The certificate MUST be in us-east-1 region for ALB
+# 3. The Route53 zone should be for your base domain (e.g., yourcompany.com)
+# 4. DNS validation records will only be created if certificate_arn is empty
+
+# ========================================
+# Okta SSO Configuration
+# ========================================
+# Enable AWS SSO with Okta integration (default: false)
+# enable_sso = false
+
+# AWS SSO instance ARN (required if enable_sso is true)
+# Can be found in IAM Identity Center console
+# sso_instance_arn = "arn:aws:sso:::instance/ssoins-1234567890abcdef"
+
+# AWS SSO identity store ID (required if enable_sso is true)
+# Can be found in IAM Identity Center console
+# sso_identity_store_id = "d-1234567890"
+
+# Okta SAML 2.0 IdP metadata URL
+# okta_idp_metadata_url = "https://dev-12345678.okta.com/app/exk1234567890abcdef/sso/saml/metadata"
+
+# SSO group names for SageMaker access control
+# sso_admin_group_name = "SageMakerAdmins"
+# sso_user_group_name = "SageMakerUsers"
+
+# ========================================
+# Auth0 Configuration (Alternative to SAML)
+# ========================================
+# Enable Auth0 authentication via ALB (default: false)
+# This is an alternative to SSO SAML for simpler single-account setups
+# enable_auth0 = false
+
+# Auth0 domain (from your Auth0 tenant)
+# auth0_domain = "dev-12345678.us.auth0.com"
+
+# Auth0 application client ID (from Auth0 app settings)
+# auth0_client_id = "AbCdEfGhIjKlMnOpQrSt1234567890"
+
+# Auth0 application client secret (from Auth0 app settings)
+# auth0_client_secret = "your-client-secret-here"
+
+# Auth0 session timeout in seconds (default: 604800 = 7 days)
+# auth0_session_timeout = 604800
+

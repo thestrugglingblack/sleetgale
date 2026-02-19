@@ -38,3 +38,5 @@ terraform.rc
 
 .idea/
 DS_Store
+# Ignore Terraform installation files
+terraform_*.zip
