@@ -1,6 +1,6 @@
 # Sleetgale Setup Guide
 
-This guide provides detailed step-by-step instructions for setting up SageMaker Studio with custom domain, SSL, and Okta authentication.
+This guide provides detailed step-by-step instructions for setting up SageMaker Studio with custom domain, SSL, and Auth0 authentication.
 
 ## Table of Contents
 

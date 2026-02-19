@@ -83,7 +83,7 @@ The PR now contains 8 focused documentation files:
    - Integration patterns
 
 ### Authentication & Access
-4. **OKTA_LAMBDA_INTEGRATION.md** (15KB) - Okta OIDC setup
+4. **AUTH0_LAMBDA_INTEGRATION.md** (15KB) - Auth0 setup
    - ALB OIDC configuration
    - User identity mapping
    - Testing and validation

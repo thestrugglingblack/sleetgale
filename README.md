@@ -1,28 +1,28 @@
 # sleetgale
 
-Terraform configuration for deploying Amazon SageMaker Studio with a serverless web portal for seamless access through custom domains and Okta authentication.
+Terraform configuration for deploying Amazon SageMaker Studio with a serverless web portal for seamless access through custom domains and Auth0 authentication.
 
 ## Overview
 
 This project deploys a complete SageMaker Studio environment with:
 - **Serverless Lambda Portal**: Web interface for one-click access to SageMaker Studio
-- **Okta Authentication**: OIDC-based authentication via Application Load Balancer
+- **Auth0 Authentication**: OIDC-based authentication via Application Load Balancer
 - **Custom Domain**: Access Studio through your branded domain (e.g., `analysis.yourcompany.com`)
 - **Cost-Optimized**: Lambda-based portal (~$0.20-1/month vs $7-10/month for container-based solutions)
 - **Secure**: All traffic over HTTPS with SSL/TLS certificates
 
-## Architecture: Okta → Lambda Portal → SageMaker Studio
+## Architecture: Auth0 → Lambda Portal → SageMaker Studio
 
 ```
 User visits: https://analysis.yourcompany.com
     ↓
 ALB checks authentication
     ↓ (not authenticated)
-Redirect to Okta Login
+Redirect to Auth0 Login
     ↓
-User authenticates with Okta
+User authenticates with Auth0
     ↓
-Okta redirects back to ALB
+Auth0 redirects back to ALB
     ↓
 ALB validates token → invokes Lambda
     ↓
@@ -48,8 +48,8 @@ User accesses their personal workspace
 - **No containers**: No Docker, no ECS, no image management
 - **Fast deployment**: Updates in seconds
 
-### Okta Integration
-- **ALB OIDC**: Authentication handled at load balancer level
+### Auth0 Integration
+- **ALB Auth0**: Authentication handled at load balancer level
 - **Automatic user mapping**: Email → SageMaker profile conversion
 - **Session management**: Configurable session timeout
 - **Zero application code**: All auth logic in AWS infrastructure
@@ -66,23 +66,23 @@ User accesses their personal workspace
 - **AWS CLI** configured with credentials
 - **AWS Account** with appropriate permissions (see [IAM_PERMISSIONS.md](IAM_PERMISSIONS.md))
 - **Domain name**: Registered domain or Route 53 hosted zone
-- **Okta account**: Admin access to configure OIDC application
+- **Auth0 account**: Admin access to configure Auth0 application
 
 ## Quick Start
 
-### 1. Create Okta OIDC Application
+### 1. Create Auth0 Application
 
-1. Log in to Okta Admin Console
-2. **Applications** → **Create App Integration**
-3. Select **OIDC - OpenID Connect** → **Web Application**
-4. Configure:
-   - **App name**: SageMaker Studio Portal
-   - **Sign-in redirect URI**: `https://YOUR-DOMAIN/oauth2/idpresponse`
-   - **Sign-out redirect URI**: `https://YOUR-DOMAIN`
+1. Log in to Auth0 Dashboard (https://manage.auth0.com/)
+2. **Applications** → **Create Application**
+3. Select **Regular Web Application** → **Create**
+4. Go to **Settings** tab and configure:
+   - **Name**: SageMaker Studio Portal
+   - **Allowed Callback URLs**: `https://YOUR-DOMAIN/oauth2/idpresponse`
+   - **Allowed Logout URLs**: `https://YOUR-DOMAIN`
 5. Save and note:
-   - Client ID
-   - Client Secret
-   - Issuer URL (typically: `https://YOUR-OKTA-DOMAIN/oauth2/default`)
+   - **Client ID**
+   - **Client Secret**
+   - **Domain** (e.g., `dev-12345678.us.auth0.com`)
 
 ### 2. Configure Terraform
 
@@ -99,15 +99,11 @@ enable_custom_domain = true
 custom_domain_name   = "analysis.yourcompany.com"
 route53_zone_id      = "Z1234567890ABC"  # Your existing hosted zone
 
-# Okta OIDC Configuration
-enable_okta_auth             = true
-okta_issuer_url              = "https://YOUR-OKTA-DOMAIN.okta.com/oauth2/default"
-okta_client_id               = "0oa1234567890abcdef"
-okta_client_secret           = "your-client-secret"
-okta_authorization_endpoint  = "https://YOUR-OKTA-DOMAIN.okta.com/oauth2/default/v1/authorize"
-okta_token_endpoint          = "https://YOUR-OKTA-DOMAIN.okta.com/oauth2/default/v1/token"
-okta_user_info_endpoint      = "https://YOUR-OKTA-DOMAIN.okta.com/oauth2/default/v1/userinfo"
-okta_session_timeout         = 604800  # 7 days
+# Auth0 Configuration
+enable_auth0        = true
+auth0_domain        = "dev-12345678.us.auth0.com"
+auth0_client_id     = "AbCdEfGhIjKlMnOpQrSt1234567890"
+auth0_client_secret = "your-client-secret"
 ```
 
 **Finding your Route 53 Zone ID:**
@@ -148,20 +144,20 @@ The Lambda function code is deployed automatically by Terraform, but you can upd
 
 1. Open your browser (use incognito/private mode for testing)
 2. Navigate to: `https://analysis.yourcompany.com`
-3. You'll be redirected to Okta for authentication
-4. Log in with your Okta credentials
+3. You'll be redirected to Auth0 for authentication
+4. Log in with your Auth0 credentials
 5. See the portal with "Launch Studio" button
 6. Click to access your SageMaker Studio workspace
 
 ## User Profile Mapping
 
-The Lambda portal automatically maps Okta users to SageMaker user profiles:
+The Lambda portal automatically maps Auth0 users to SageMaker user profiles:
 
-- **Okta user**: `jane.doe@company.com`
+- **Auth0 user**: `jane.doe@company.com`
 - **SageMaker profile**: `jane-doe-company-com`
 
 The portal:
-1. Extracts the email from ALB OIDC headers
+1. Extracts the email from ALB Auth0 headers
 2. Converts email to valid profile name (alphanumeric + hyphens)
 3. Checks if the profile exists in SageMaker
 4. Generates a presigned URL for that specific user's workspace
@@ -194,7 +190,7 @@ domain_name = "sleetgale"
 
 # Keep these false or omit them
 enable_custom_domain = false
-enable_okta_auth     = false
+enable_auth0     = false
 ```
 
 Access via AWS Console:
@@ -211,26 +207,26 @@ enable_custom_domain = true
 custom_domain_name   = "analysis.yourcompany.com"
 route53_zone_id      = "Z1234567890ABC"
 
-enable_okta_auth     = false
+enable_auth0     = false
 ```
 
 ### Custom Domain With Okta (Recommended)
 
-Secure portal with Okta authentication:
+Secure portal with Auth0 authentication:
 
 ```hcl
 enable_custom_domain = true
 custom_domain_name   = "analysis.yourcompany.com"
 route53_zone_id      = "Z1234567890ABC"
 
-enable_okta_auth     = true
-# ... (Okta OIDC settings as shown above)
+enable_auth0     = true
+# ... (Auth0 settings as shown above)
 ```
 
 ## Documentation
 
 - **[SETUP.md](SETUP.md)** - Detailed setup and configuration guide
-- **[OKTA_LAMBDA_INTEGRATION.md](OKTA_LAMBDA_INTEGRATION.md)** - Complete Okta integration guide
+- **[AUTH0_LAMBDA_INTEGRATION.md](AUTH0_LAMBDA_INTEGRATION.md)** - Complete Auth0 integration guide
 - **[IAM_PERMISSIONS.md](IAM_PERMISSIONS.md)** - Required AWS IAM permissions
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and design
 - **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Common commands and troubleshooting
@@ -242,10 +238,10 @@ enable_okta_auth     = true
 - Verify Lambda has permissions to call SageMaker APIs
 - Check ALB target health: `aws elbv2 describe-target-health --target-group-arn <ARN>`
 
-### Okta authentication fails
-- Verify Okta redirect URI matches your domain exactly
+### Auth0 authentication fails
+- Verify Auth0 callback URL matches your domain exactly
 - Check client ID and secret in terraform.tfvars
-- Ensure Okta endpoints are correct for your tenant
+- Ensure auth0_domain is correct for your tenant
 - Review ALB logs for authentication errors
 
 ### User profile not found
