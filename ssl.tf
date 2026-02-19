@@ -166,6 +166,16 @@ resource "aws_lb_listener" "https" {
   certificate_arn   = local.certificate_arn
 
   # Auth0 Authentication (if enabled)
+  # 
+  # Auth0 OIDC Configuration:
+  # - Uses standard OIDC endpoints auto-generated from auth0_domain
+  # - No separate endpoint variables needed (auth0_authorization_endpoint, etc.)
+  # - Only requires: enable_auth0, auth0_domain, auth0_client_id, auth0_client_secret
+  # - Endpoints are constructed as:
+  #   * Issuer: https://{auth0_domain}/
+  #   * Authorization: https://{auth0_domain}/authorize
+  #   * Token: https://{auth0_domain}/oauth/token
+  #   * UserInfo: https://{auth0_domain}/userinfo
   dynamic "default_action" {
     for_each = var.enable_auth0 ? [1] : []
     content {
@@ -173,12 +183,17 @@ resource "aws_lb_listener" "https" {
       order = 1
 
       authenticate_oidc {
+        # Endpoints auto-generated from var.auth0_domain (no separate variables needed)
         issuer                       = "https://${var.auth0_domain}/"
         authorization_endpoint       = "https://${var.auth0_domain}/authorize"
         token_endpoint               = "https://${var.auth0_domain}/oauth/token"
         user_info_endpoint           = "https://${var.auth0_domain}/userinfo"
+        
+        # Auth0 application credentials (from variables.tf)
         client_id                    = var.auth0_client_id
         client_secret                = var.auth0_client_secret
+        
+        # Session configuration
         session_cookie_name          = "AWSELBAuthSessionCookie"
         session_timeout              = var.auth0_session_timeout
         scope                        = "openid email profile"
