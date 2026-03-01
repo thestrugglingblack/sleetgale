@@ -92,6 +92,7 @@ resource "aws_lambda_function" "portal" {
       SAGEMAKER_DOMAIN_ID  = aws_sagemaker_domain.sleetgale.id
       DEFAULT_USER_PROFILE = var.enable_sso ? "default-sso-user" : "default-user"
       SESSION_DURATION     = "43200"
+      REQUIRE_AUTH         = tostring(var.enable_auth0)
     }
   }
 

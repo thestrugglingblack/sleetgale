@@ -40,3 +40,4 @@ terraform.rc
 DS_Store
 # Ignore Terraform installation files
 terraform_*.zip
+portal/__pycache__
