@@ -15,6 +15,7 @@ AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
 SAGEMAKER_DOMAIN_ID = os.environ.get('SAGEMAKER_DOMAIN_ID', '')
 DEFAULT_USER_PROFILE = os.environ.get('DEFAULT_USER_PROFILE', 'default-user')
 SESSION_DURATION = int(os.environ.get('SESSION_DURATION', '43200'))  # 12 hours
+REQUIRE_AUTH = os.environ.get('REQUIRE_AUTH', 'false').lower() == 'true'
 
 # Initialize SageMaker client
 sagemaker = boto3.client('sagemaker', region_name=AWS_REGION)
@@ -272,10 +273,31 @@ def lambda_handler(event, context):
     path = event.get('path', '/')
     query_params = event.get('queryStringParameters') or {}
     
-    # Health check endpoint
+    # Health check endpoint (always allowed, no auth required)
     if path == '/health' or query_params.get('action') == 'health':
         return response(200, {'status': 'healthy'}, is_alb)
     
+    # Extract authenticated user from ALB OIDC headers
+    headers_lower = {k.lower(): v for k, v in event.get('headers', {}).items()}
+    user_email = headers_lower.get('x-amzn-oidc-identity')
+
+    # Enforce authentication when required (defense-in-depth alongside ALB OIDC)
+    # When enable_auth0=true, the ALB redirects unauthenticated requests to Auth0
+    # before they reach Lambda. This check catches any requests that slip through.
+    if REQUIRE_AUTH and not user_email:
+        print("Unauthenticated request blocked: authentication required but no OIDC identity header present")
+        return {
+            'statusCode': 401,
+            'statusDescription': '401 Unauthorized',
+            'isBase64Encoded': False,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+                'WWW-Authenticate': 'Bearer'
+            },
+            'body': json.dumps({'error': 'Authentication required. Please authenticate via the configured identity provider.'})
+        }
+
     # Launch endpoint - generate presigned URL
     if http_method == 'POST' or query_params.get('action') == 'launch':
         try:
@@ -320,11 +342,19 @@ def lambda_handler(event, context):
             return response(500, {'error': error_message}, is_alb)
     
     # Default: serve HTML portal page
-    html = HTML_TEMPLATE.format(
-        domain_id=SAGEMAKER_DOMAIN_ID,
-        region=AWS_REGION,
-        user_profile=DEFAULT_USER_PROFILE
-    )
+    # get_user_from_alb_headers returns DEFAULT_USER_PROFILE when no OIDC header is present,
+    # so calling it unconditionally here is safe and avoids re-extracting the header.
+    display_profile = get_user_from_alb_headers(event)
+    # Use str.replace() instead of .format() to avoid KeyError from unescaped CSS braces
+    # (CSS rules like `* { margin: 0; }` conflict with Python format string syntax).
+    # The template uses {{ and }} only for JavaScript blocks (e.g. launchStudio() {{ ... }});
+    # these are unescaped last so that variable substitutions happen first.
+    html = (HTML_TEMPLATE
+        .replace('{domain_id}', SAGEMAKER_DOMAIN_ID)
+        .replace('{region}', AWS_REGION)
+        .replace('{user_profile}', display_profile)
+        .replace('{{', '{')
+        .replace('}}', '}'))
     
     return {
         'statusCode': 200,
@@ -332,7 +362,7 @@ def lambda_handler(event, context):
         'isBase64Encoded': False,
         'headers': {
             'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-store, no-cache, must-revalidate, private'
         },
         'body': html
     }
@@ -349,7 +379,7 @@ def response(status_code, body, is_alb=False):
         'isBase64Encoded': False,
         'headers': {
             'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-store, no-cache, must-revalidate, private'
         },
         'body': response_body
     }
